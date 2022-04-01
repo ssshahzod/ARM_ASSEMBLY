@@ -1,0 +1,11 @@
+.cache
+.config
+.local
+.ssh
+.bashrc
+.bash_history
+.bash_logout
+.bash_profile
+.inputrc
+.lesshst
+.viminfo
