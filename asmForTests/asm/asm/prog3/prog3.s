@@ -8,7 +8,7 @@ mas:
 	.quad	8, 7, 1, 9, 5, 2, 6, 0, 4, 3
 	.text
 	.align	2
-	.global _start	
+	.global _start
 	.type	_start, %function
 _start:
 	adr	x0, n

@@ -35,7 +35,6 @@ _start:
 	adds 	x12, x10, x11 //a^2 + b^2
 	subs 	x12, x12, x9 //; x12 = (a^2 - ab + b^2)
 	adds    x9, x1, x2
-	
 	mul     x12, x12, x9 //;numerator result
 	BEQ zeroNum
 	
@@ -45,21 +44,21 @@ _start:
 	adds    x10, x10, x5
 	BEQ zeroDen
 
-	sdiv    res, x12, x10
+	sdiv    x8, x12, x10
 	adr     x0, res
-	str     x8, [x0]	
+	str     x8, [x0] //store x8 to the adr res	
 	b exit
 
-overFlow:
+/*overFlow:
 	mov x0, #2
 	mov x8, #93
 	svc #0
-	.size _start, .-_start
+	.size _start, .-_start */
 
 zeroNum:
-	mov res, #0
-    adr x0, res
-    str x1, [x0]
+	adr x0, res
+	mov x1, #1
+	str x1, [x0]
 	b exit
 
 zeroDen:

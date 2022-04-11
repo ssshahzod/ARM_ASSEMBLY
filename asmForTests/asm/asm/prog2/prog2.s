@@ -10,7 +10,7 @@ max:
 	.skip	8
 	.text
 	.align	2
-	.global _start	
+	.global _start
 	.type	_start, %function
 _start:
 	adr	x0, max
