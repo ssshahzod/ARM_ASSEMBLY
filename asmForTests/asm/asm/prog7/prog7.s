@@ -14,23 +14,24 @@ _start:
 	adr	x0, n
 	ldr	x0, [x0]
 	adr	x1, mas
-	lsr	x2, x0, #1
-	sub	x3, x0, #1
+	lsr	x2, x0, #1 //get the i = size/2
+	sub	x3, x0, #1 //get the max index
 L0:
-	cbz	x2, L1
-	sub	x2, x2, #1
+	cbz	x2, L1 //if size/2 == 0 -> L1
+	sub	x2, x2, #1 //move to the beginning of the array
 	b	L2
 L1:
-	cbz	x3, L6
-	ldr	x7, [x1, x2, lsl #3]
-	ldr	x8, [x1, x3, lsl #3]
+	cbz	x3, L6 
+	//if x3 != 0:
+	ldr	x7, [x1, x2, lsl #3]//get 
+	ldr	x8, [x1, x3, lsl #3]//
 	str	x7, [x1, x3, lsl #3]
 	str	x8, [x1, x2, lsl #3]
 	sub	x3, x3, #1
 	cbz	x3, L6
 L2:
-	ldr	x7, [x1, x2, lsl #3]
-	mov	x5, x2
+	ldr	x7, [x1, x2, lsl #3] //
+	mov	x5, x2 //
 L3:
 	mov	x4, x5
 	lsl	x5, x5, #1

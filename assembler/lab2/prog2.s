@@ -27,10 +27,9 @@ _start:
 	adr x3, mins
 	adr x4, matrix
 	mov x5, #0 // i
-	mov x6, #0 // j
 
 process_line:
-		
+	
 process_line2:
 	cmp x5, x1
 	bge reset_index
