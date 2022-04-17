@@ -18,7 +18,7 @@ _start:
 	sub	x3, x0, #1 //get the max index
 L0:
 	cbz	x2, L1 //if size/2 == 0 -> L1
-	sub	x2, x2, #1 //move to the beginning of the array
+	sub	x2, x2, #1 //move to the 1 step left in the array
 	b	L2
 L1:
 	cbz	x3, L6 
@@ -30,17 +30,21 @@ L1:
 	sub	x3, x3, #1
 	cbz	x3, L6
 L2:
-	ldr	x7, [x1, x2, lsl #3] //
+	ldr	x7, [x1, x2, lsl #3] //get mas[x2]
 	mov	x5, x2 //
 L3:
 	mov	x4, x5
 	lsl	x5, x5, #1
-	add	x5, x5, #1
-	cmp	x5, x3
+	add	x5, x5, #1 //getting index of the treenode
+	cmp	x5, x3 //
 	bgt	L5
-	ldr	x8, [x1, x5, lsl #3]
-	beq	L4
-	add	x6, x5, #1
+	ldr	x8, [x1, x5, lsl #3]// get mas[x5]
+	beq	L4 
+	add	x6, x5, #1 //getting index of the second treenode
+	// x7 - parent node
+//    /  \ 
+//  x8   x9
+
 	ldr	x9, [x1, x6, lsl #3]
 	cmp	x8, x9
 	bge	L4
