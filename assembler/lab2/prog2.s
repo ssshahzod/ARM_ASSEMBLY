@@ -28,6 +28,8 @@ _start:
 	adr x4, matrix
 	mov x5, #0 // i
 
+
+//пройтись по матрице и составить массив минимальных элементов из каждой строки
 process_line:
 	
 process_line2:
@@ -42,7 +44,8 @@ reset_index:
 	cmp x6, x2
 	bge heapsort
 	b process_line
-	
+
+//отсортировать этот самый массив, перемещая строки и в самой матрице
 heapsort:
 	
 
