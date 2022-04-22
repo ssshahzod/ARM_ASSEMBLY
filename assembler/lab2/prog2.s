@@ -3,9 +3,9 @@
 	.data
 	.align 2
 
-numcolumn:
+num_column:
 	.word 5
-numrows:
+num_rows:
 	.word 4
 
 matrix: //;matrix
@@ -22,9 +22,9 @@ mins:
 	.type _start, %function
 
 _start:
-	adr x5, numcolumn
+	adr x5, num_column
 	ldr w0, [x5]
-	adr x5, numrows
+	adr x5, num_rows
 	ldr w1, [x5]
 	adr x2, mins
 	adr x3, matrix
@@ -38,7 +38,7 @@ _start:
 	bge reset_index //
 	cmp x5, #0
 	beq process_first_elem
-	ldr x8, [x4, x5, lsl #2]
+	ldr x8, [x4, x5, lsl #2] 
 	cmp x7, x8
 	bgt new_min
 	add x5, x5, #1
@@ -56,7 +56,8 @@ process_first_elem:
 
 reset_index:
 	str x3, x7 
-	mov x4, [x10, x5, lsl #2]
+	add x4, x10, [x5, lsl #2]
+	//mov x4, [x10, x5, lsl #2]
 	mov x5, #0
 	add x6, x6, #1
 	cmp x6, x2
