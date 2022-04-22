@@ -56,7 +56,7 @@ process_first_elem:
 
 reset_index:
 	str x3, x7 
-	mov x4, x10, x5, lsl #2
+	add x4, x10, x5, lsl #2
 	//mov x4, [x10, x5, lsl #2]
 	mov x5, #0
 	add x6, x6, #1
