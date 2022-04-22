@@ -23,9 +23,9 @@ mins:
 
 _start:
 	adr x5, numcolumn
-	ldr x0, [x5]
+	ldr w0, [x5]
 	adr x5, numrows
-	ldr x1, [x5]
+	ldr w1, [x5]
 	adr x2, mins
 	adr x3, matrix
 	mov x4, x3
