@@ -20,10 +20,10 @@ mins:
 	.type _start, %function
 
 _start:
-	adr x0, num_column
-	ldr x1, [x0]
-	adr x0, num_rows
-	ldr x2, [x0]
+	adr x5, num_column
+	ldr x1, [x5]
+	adr x5, num_rows
+	ldr x2, [x5]
 	adr x3, mins
 	adr x10, matrix
 	mov x4, x10
@@ -67,7 +67,7 @@ reset_index:
 	
 
 exit:
-	mov x0, #0
+	mov x5, #0
 	mov x8, #93
 	svc #0
 	.size _start, .-_start
