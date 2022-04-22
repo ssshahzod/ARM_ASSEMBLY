@@ -7,9 +7,9 @@ matrix: //;matrix
 	.word  0, 1, 92, 11, 2
 	.word  34, 44, 67, 88, 5
 	.word  3, 23, 74, 7, 4
-numColumn:
+num_column:
 	.word 5
-numRows:
+num_rows:
 	.word 4
 mins:
 	.skip 40
@@ -20,12 +20,13 @@ mins:
 	.type _start, %function
 
 _start:
-	adr x0, numColumn
+	adr x0, num_column
 	ldr x1, [x0]
-	adr x0, numRows
+	adr x0, num_rows
 	ldr x2, [x0]
 	adr x3, mins
-	adr x4, matrix
+	adr x10, matrix
+	mov x4, x10
 	mov x5, #0 // i
 	mov x6, #0 // j
 
@@ -49,20 +50,20 @@ process_first_elem:
 	ldr x7, [x4, x5, lsl #2]
 	add x5, x5, #1
 	b process_line
-
-process_line2:
 	
 
 reset_index:
-	//str x9, 
+	str x3, x7 
+	mov x4, [x10, x5, lsl #2]
 	mov x5, #0
 	add x6, x6, #1
 	cmp x6, x2
-	bge heapsort
+	//bge heapsort
+
 	b process_line
 
 //отсортировать этот самый массив, перемещая строки и в самой матрице
-heapsort:
+//heapsort:
 	
 
 exit:
