@@ -3,9 +3,9 @@
 	.data
 	.align 2
 
-num_column:
+numcolumn:
 	.word 5
-num_rows:
+numrows:
 	.word 4
 
 matrix: //;matrix
@@ -13,6 +13,7 @@ matrix: //;matrix
 	.word  0, 1, 92, 11, 2
 	.word  34, 44, 67, 88, 5
 	.word  3, 23, 74, 7, 4
+
 mins:
 	.skip 40
 	.text
@@ -21,9 +22,9 @@ mins:
 	.type _start, %function
 
 _start:
-	adr x5, num_column
+	adr x5, numcolumn
 	ldr x0, [x5]
-	adr x5, num_rows
+	adr x5, numrows
 	ldr x1, [x5]
 	adr x2, mins
 	adr x3, matrix
