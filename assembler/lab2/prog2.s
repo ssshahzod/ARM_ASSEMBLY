@@ -7,9 +7,9 @@ matrix: //;matrix
 	.word  0, 1, 92, 11, 2
 	.word  34, 44, 67, 88, 5
 	.word  3, 23, 74, 7, 4
-n:
+numColumn:
 	.word 5
-m:
+numRows:
 	.word 4
 mins:
 	.skip 40
@@ -20,21 +20,37 @@ mins:
 	.type _start, %function
 
 _start:
-	adr x0, n
-	ldr x1, [x0] // number of columns
-	adr x0, m
-	ldr x2, [x0] // number of rows
+	adr x0, numColumn
+	ldr x1, [x0]
+	adr x0, numRows
+	ldr x2, [x0]
 	adr x3, mins
 	adr x4, matrix
 	mov x5, #0 // i
-
+	mov x6, #0 // j
 
 //пройтись по матрице и составить массив минимальных элементов из каждой строки
 process_line:
-	
-process_line2:
 	cmp x5, x1
-	bge reset_index
+	bge reset_index //
+	cmp x5, #0
+	beq process_first_elem
+	ldr x8, [x4, x5, lsl #2]
+	cmp x7, x8
+	bgt new_min
+	add x5, x5, #1
+	b process_line
+
+new_min:
+	mov x7, x8
+	b process_line
+
+process_first_elem:
+	ldr x7, [x4, x5, lsl #2]
+	add x5, x5, #1
+	b process_line
+
+process_line2:
 	
 
 reset_index:
