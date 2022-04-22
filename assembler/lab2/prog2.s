@@ -7,14 +7,14 @@ num_column:
 	.word 5
 num_rows:
 	.word 4
-mins:
-	.skip 40
 
 matrix: //;matrix
 	.word  10, 12, 25, 9, 14
 	.word  0, 1, 92, 11, 2
 	.word  34, 44, 67, 88, 5
 	.word  3, 23, 74, 7, 4
+mins:
+	.skip 40
 	.text
 	.align 2
 	.global _start
@@ -22,12 +22,12 @@ matrix: //;matrix
 
 _start:
 	adr x5, num_column
-	ldr x1, [x5]
+	ldr x0, [x5]
 	adr x5, num_rows
-	ldr x2, [x5]
-	adr x3, mins
-	adr x10, matrix
-	mov x4, x10
+	ldr x1, [x5]
+	adr x2, mins
+	adr x3, matrix
+	mov x4, x3
 	mov x5, #0 // i
 	mov x6, #0 // j
 
