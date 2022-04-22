@@ -2,11 +2,7 @@
 
 	.data
 	.align 2
-matrix: //;matrix
-	.word  10, 12, 25, 9, 14
-	.word  0, 1, 92, 11, 2
-	.word  34, 44, 67, 88, 5
-	.word  3, 23, 74, 7, 4
+
 num_column:
 	.word 5
 num_rows:
@@ -14,6 +10,11 @@ num_rows:
 mins:
 	.skip 40
 
+matrix: //;matrix
+	.word  10, 12, 25, 9, 14
+	.word  0, 1, 92, 11, 2
+	.word  34, 44, 67, 88, 5
+	.word  3, 23, 74, 7, 4
 	.text
 	.align 2
 	.global _start
