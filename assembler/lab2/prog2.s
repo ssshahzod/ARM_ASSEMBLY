@@ -38,7 +38,7 @@ _start:
 	bge reset_index //
 	cmp x5, #0
 	beq process_first_elem
-	ldr x8, [x4, x5, lsl #2] 
+	ldr w8, [x4, x5, lsl #2] 
 	cmp x7, x8
 	bgt new_min
 	add x5, x5, #1
@@ -49,7 +49,7 @@ new_min:
 	b process_line
 
 process_first_elem:
-	ldr x7, [x4, x5, lsl #2]
+	ldr w7, [x4, x5, lsl #2]
 	add x5, x5, #1
 	b process_line
 	
