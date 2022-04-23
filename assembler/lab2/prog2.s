@@ -26,6 +26,8 @@ _start:
 	ldr w0, [x5]
 	adr x5, num_rows
 	ldr w1, [x5]
+	sub w0, w0, #1 //max indexes possible
+	sub w1, w1, #1 //
 	adr x2, mins
 	adr x3, matrix
 	mov x4, x3
@@ -34,7 +36,7 @@ _start:
 
 //пройтись по матрице и составить массив минимальных элементов из каждой строки
  process_line:
-	cmp x5, x1
+	cmp x5, x0 //max index is 4, while length of the row is 5
 	bge reset_index //
 	cmp x5, #0
 	beq process_first_elem
@@ -55,7 +57,7 @@ process_first_elem:
 	
 
 reset_index:
-	str x3, x7 
+	str x3, [x7] //str x3, x7 
 	add x4, x10, x5, lsl #2
 	//mov x4, [x10, x5, lsl #2]
 	mov x5, #0
