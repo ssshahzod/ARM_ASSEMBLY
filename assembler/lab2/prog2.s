@@ -59,13 +59,16 @@ reset_index:
 	add x4, x4, x5, lsl #2
 	mov x5, #0
 	add x6, x6, #1
-	cmp x6, x2
-	//bge heapsort
-
+	cmp x6, x1
+	bge heapsort
 	b process_line
 
-//отсортировать этот самый массив, перемещая строки и в самой матрице
-//heapsort:
+//sort the array of the mins
+heapsort:
+	cmp x6, x1
+	beq exit
+	lsr x5, x0, #1 //get i = size / 2
+	
 
 exit:
 	mov x5, #0
