@@ -41,7 +41,7 @@ _start:
 	cmp x5, #0
 	beq process_first_elem
 	ldr w8, [x4, x5, lsl #2] 
-	cmp x7, x8
+	cmp w7, w8
 	bgt new_min
 	add x5, x5, #1
 	b process_line
@@ -57,7 +57,7 @@ process_first_elem:
 	
 
 reset_index:
-	str x3, [x7] //str x3, x7 
+	str w7, [x2, x6, lsl #2] //str x3, x7 
 	add x4, x10, x5, lsl #2
 	//mov x4, [x10, x5, lsl #2]
 	mov x5, #0
