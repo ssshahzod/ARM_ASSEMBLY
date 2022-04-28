@@ -60,15 +60,32 @@ reset_index:
 	mov x5, #0
 	add x6, x6, #1
 	cmp x6, x1
-	bge heapsort
+	bge heapsort0
 	b process_line
 
 //sort the array of the mins
-heapsort:
-	cmp x6, x1
-	beq exit
+heapsort0:
+	mov x4, x3 //beginning of the matrix
+
+heapsort1:
+	cmp x6, x1 
+	beq exit //exit if processed all lines
+	add x4, x4, x0, lsl #2 //get next line beginning
 	lsr x5, x0, #1 //get i = size / 2
+	sub x6, x0, #1
+	/*
+heapsort2:
+	cbz x5, heapsort3
+	sub x5, x5, #1
+	b heapsort4	
 	
+heapsort3:
+	
+
+heapsort4:
+
+*/
+
 
 exit:
 	mov x5, #0
