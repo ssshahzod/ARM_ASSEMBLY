@@ -64,28 +64,60 @@ reset_index:
 	b process_line
 
 //sort the array of the mins
-heapsort0:
+heapsort_set_matr:
 	mov x4, x3 //beginning of the matrix
 
-heapsort1:
+heapsort_set_index:
 	cmp x6, x1 
 	beq exit //exit if processed all lines
 	add x4, x4, x0, lsl #2 //get next line beginning
 	lsr x5, x0, #1 //get i = size / 2
 	sub x6, x0, #1
 	/*
-heapsort2:
+heapsort2: //L0
 	cbz x5, heapsort3
 	sub x5, x5, #1
 	b heapsort4	
 	
-heapsort3:
-	
+heapsort3: //L1
+	cbz x6, heapsort8 //L6
+	ldr w7, [x2, x5, lsl #2]
+	ldr w8, [x2, x6, lsl #2]
+	str w8, [x2, x5, lsl #2]
+	str w7, [x2, x6, lsl #2]
+	sub x6, x6, #1
+	cbz x3, heapsort8
 
-heapsort4:
+heapsort4: //L2
+	ldr w7, [x2, x5, lsl #2]
+	mov x10, x5
+
+heapsort5: //L3
+	mov x9, x10
+	lsl x10, x10, #1
+	add x10, x10, #1
+	cmp x10, x6
+	bgt heapsort7 //L5
+	ldr w8, [x2, x10, lsl #2]
+	beq heapsort6 //L4
+	add x11, x10, #1
+	ldr w12, [x2, x11, lsl #2]
+	cmp w8, w12
+	bge heapsort6
+	add x10, x10, #1
+	mov x8, x12
+
+heapsort6: //L4
+	cmp x7, x8
+	bge heapsort7
+	str w8, [x2, x9, lsl #2]
+	b heapsort5
+
+heapsort7: //L5
+	str w7, [x2, x9, lsl #2]
+	b heapsort2
 
 */
-
 
 exit:
 	mov x5, #0
