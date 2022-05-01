@@ -73,7 +73,7 @@ heapsort_set_index:
 	add x4, x4, x0, lsl #2 //get next line beginning
 	lsr x5, x0, #1 //get i = size / 2
 	sub x6, x0, #1
-	/*
+	
 heapsort2: //L0
 	cbz x5, heapsort3
 	sub x5, x5, #1
@@ -116,8 +116,6 @@ heapsort6: //L4
 heapsort7: //L5
 	str w7, [x2, x9, lsl #2]
 	b heapsort2
-
-*/
 
 exit:
 	mov x5, #0
