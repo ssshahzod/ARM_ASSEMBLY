@@ -60,7 +60,7 @@ reset_index:
 	mov x5, #0
 	add x6, x6, #1
 	cmp x6, x1
-	bge heapsort0
+	bge heapsort_set_matr
 	b process_line
 
 //sort the array of the mins
@@ -80,13 +80,13 @@ heapsort2: //L0
 	b heapsort4	
 	
 heapsort3: //L1
-	cbz x6, heapsort8 //L6
+	cbz x6, exit //L6
 	ldr w7, [x2, x5, lsl #2]
 	ldr w8, [x2, x6, lsl #2]
 	str w8, [x2, x5, lsl #2]
 	str w7, [x2, x6, lsl #2]
 	sub x6, x6, #1
-	cbz x3, heapsort8
+	cbz x3, exit
 
 heapsort4: //L2
 	ldr w7, [x2, x5, lsl #2]
