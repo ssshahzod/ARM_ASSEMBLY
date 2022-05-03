@@ -22,3 +22,15 @@ $(EXE): $(OBJS)
 .s.o:
 		$(AS) $(ASFLAGS) $< -o $@
 		
+.PHONY: default 
+deafault: asc
+
+.PHONY: asc
+asc:
+	$(AS) $(ASFLAGS) $(SRCS) -o $(OBJS) --defsym ascending=1
+	$(LD) $(LDFLAGS) $(OBJS) -o $(EXE)
+
+.PHONY: desc
+desc:
+	$(AS) $(ASFLAGS) $(SRCS) -o $(OBJS)
+	$(LD) $(LDFLAGS) $(OBJS) -o $(EXE)
