@@ -68,9 +68,9 @@ heapsort_set_matr:
 	mov x4, x3 //beginning of the matrix
 
 heapsort_set_index:
-	cmp x6, x1 
-	beq exit //exit if processed all lines
-	add x4, x4, x0, lsl #2 //get next line beginning
+	//cmp x6, x1 
+	//beq exit //exit if processed all lines
+	//add x4, x4, x0, lsl #2 //get next line beginning
 	lsr x5, x0, #1 //get i = size / 2
 	sub x6, x0, #1
 	
