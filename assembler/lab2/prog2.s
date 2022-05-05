@@ -73,6 +73,7 @@ heapsort_set_index:
 	//add x4, x4, x0, lsl #2 //get next line beginning
 	lsr x5, x1, #1 //get i = size / 2
 	sub x6, x1, #1
+	sub x13, x0, #1 //max index in the line
 	
 heapsort0: //beginning of the sort
 	cbz x5, heapsort1
@@ -89,7 +90,7 @@ heapsort1: //processing last 2 elems
 	cbz x6, exit
 
 heapsort2: //load value from index
-	ldr w7, [x2, x5, lsl #2] //get parent tree node
+	ldr w7, [x2, x5, lsl #2] //get parent tree node, i1 = x5
 	mov x10, x5
 
 heapsort3: //
@@ -102,30 +103,58 @@ heapsort3: //
 	beq heapsort4 
 	add x11, x10, #1 //getting index of the right tree node
 	ldr w12, [x2, x11, lsl #2]
-	cmp w8, w12
+	cmp w8, w12 //if(w8 >= (<=) w12) => heapsort4; i2 = x10
 	.ifdef ascending
 	bge heapsort4
 	.else 
 	ble heapsort4
 	.endif
-	add x10, x10, #1
+	add x10, x10, #1 //as a result we have 2 indexes: x5 and x10
+	//x7 - x5; x8 - x10
 	mov x8, x12
 
 heapsort4: //
+	//mov x14, #0 //counter of moved elems
 	cmp x7, x8
 	.ifdef ascending
 	bge heapsort5
 	.else
 	ble heapsort5
-	.endif
+	.endif //i = x10 line should be moved
+	
+	//mov x11 x10 
+	//mul x //get address of the beginning of the line 
 	str w8, [x2, x9, lsl #2]
+	//b move_matrix_lines
 	b heapsort3
 
 heapsort5: //store the top of the heap
+	//i = x5 line should be moved
+
+	//mov x11 x5
 	str w7, [x2, x9, lsl #2]
 	
 move_matrix_lines:
-	
+	//moving lines {...}
+	cmp x14, x13
+	bge next_iteration
+	ldr	x15, [x4, x14, lsl #2]//get 
+	ldr	x16, [x4, x14, lsl #2]//
+	str	x15, [x4, x14, lsl #2]
+	str	x16, [x4, x14, lsl #2]
+	add x14, x14, #1
+	b move_matrix_lines
+
+
+next_iteration:
+    //mov x4, x3
+	//cmp x7, x8
+	//.ifdef ascending
+	//bge heapsort0
+	//.else
+	//ble heaposrt0
+	//.endif
+	//b heapsort3
 	b heapsort0
 
 exit:
