@@ -68,12 +68,9 @@ reset_index:
 	b process_line
 
 //sort the array of the sort_mins
-
 heapsort_set_index:
-
 	lsr x5, x1, #1 //get i = size / 2
 	sub x6, x1, #1
-	sub x13, x0, #1 //max index in the line
 	
 heapsort0:
 	cbz x5, heapsort1 //if(x5 == 0) => heapsort1
@@ -127,8 +124,49 @@ heapsort5:
 	str w7, [x2, x9, lsl #2]	
 	b heapsort0
 
-move_matrix_lines:
+prepare_to_move:
+	// x0 - num_column; x1 - num_lines; x2 - sort_mins
+	// x3 - matrix; x13 - mins
+	mov x5, #0 
+	sub x6, x0, #1 //index for sort_mins array
+	mov x7, #0 //index for elems in line
+	ldr w8, [x2, x6, lsl #2]
 
+
+compare_arrays_elems:
+	cmp x6, #0
+	ble exit
+	ldr w9, [x13, x5, lsl #2]
+	cmp x8, x9
+	beq comp_indexes
+	add x5, x5, #1
+	b compare_arrays_elems
+
+comp_indexes:
+	cmp x5, x6
+	beq update_index
+	mul x14, x0, x5
+	mul x15, x0, x6
+	add x14, x3, x14, lsl #2 //get addresses of the lines
+	add x15, x3, x15, lsl #2
+	b move_lines
+
+move_lines:
+	cmp x7, x0
+	bge update_index
+	ldr w10, [x14, x7, lsl #2]
+	ldr w11, [x15, x7, lsl #2]
+	str w10, [x15, x7, lsl #2]
+	str w11, [x14, x7, lsl #2]
+	add x7, x7, #1
+	b move_lines
+
+update_index:
+	sub x6, x6, #1
+	ldr w8, [x2, x6, lsl #2]
+	mov x5, #0
+	mov x7, #0
+	b compare_arrays_elems
 
 
 
