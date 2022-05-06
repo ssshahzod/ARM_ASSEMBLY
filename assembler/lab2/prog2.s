@@ -113,48 +113,70 @@ heapsort3: //
 	mov x8, x12
 
 
-
 heapsort4: //
 	cmp x7, x8
 	.ifdef ascending
 	bge heapsort5
 	.else
 	ble heapsort5
-	.endif //i = x10 line should be moved
-	
-	mov x11, x10 
+	.endif
 	str w8, [x2, x9, lsl #2]
-	b prep_line_index
-heapsort5: //store the top of the heap
-	//i = x5 line should be moved
+	b heapsort3
 
-	mov x11, x5
+heapsort5: //store the top of the heap
 	str w7, [x2, x9, lsl #2]
 	
-prep_line_index:
-	add x4, x3, x17, lsl #2 //addr of the last, not sorted line
-	add x18, x3, x11, lsl #2
-
 move_matrix_lines:
-	cmp x14, x13
-	bge next_iteration
-	ldr	w15, [x4, x14, lsl #2]//get 
-	ldr	w16, [x18, x14, lsl #2]//
-	str	w15, [x18, x14, lsl #2]
-	str	w16, [x4, x14, lsl #2]
-	add x14, x14, #1
-	b move_matrix_lines
+	
+	b heapsort0
 
 
-next_iteration:
-    mov x4, x3
-	cmp x7, x8
-	.ifdef ascending
-	bge heapsort0
-	.else
-	ble heaposrt0
-	.endif
-	b heapsort3
+
+
+
+
+
+
+@ heapsort4: //
+@ 	cmp x7, x8
+@ 	.ifdef ascending
+@ 	bge heapsort5
+@ 	.else
+@ 	ble heapsort5
+@ 	.endif //i = x10 line should be moved
+@ 	mov x11, x10 
+@ 	str w8, [x2, x9, lsl #2]
+@ 	b prep_line_index
+
+@ heapsort5: //store the top of the heap
+@ 	//i = x5 line should be moved
+@ 	mov x11, x5
+@ 	str w7, [x2, x9, lsl #2]
+	
+@ prep_line_index:
+@ 	add x4, x3, x17, lsl #2 //addr of the last, not sorted line
+@ 	add x18, x3, x11, lsl #2
+
+@ move_matrix_lines:
+@ 	cmp x14, x13
+@ 	bge next_iteration
+@ 	ldr	w15, [x4, x14, lsl #2]//get 
+@ 	ldr	w16, [x18, x14, lsl #2]//
+@ 	str	w15, [x18, x14, lsl #2]
+@ 	str	w16, [x4, x14, lsl #2]
+@ 	add x14, x14, #1
+@ 	b move_matrix_lines
+
+
+@ next_iteration:
+@     mov x4, x3
+@ 	cmp x7, x8
+@ 	.ifdef ascending
+@ 	bge heapsort0
+@ 	.else
+@ 	ble heapsort0
+@ 	.endif
+@ 	b heapsort3
 
 exit:
 	mov x5, #0
