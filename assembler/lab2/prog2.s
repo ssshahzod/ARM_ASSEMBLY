@@ -69,12 +69,12 @@ heapsort_set_index:
 	lsr x5, x1, #1 //get i = size / 2
 	sub x6, x1, #1
 	sub x13, x0, #1 //max index in the line
-	mov x17, x1 //index of the last line
+	sub x17, x17, #1 //index of the line that is going to be moved
 	
-heapsort0: //beginning of the sort
-	mov x14, #0 //counter of the moved elems
-	cbz x5, heapsort1
-	sub x17, x17, #1
+heapsort0:
+	mov x14, #0 //counter of the moved elems in line
+
+	cbz x5, heapsort1 //if(x5 == 0) => heapsort1
 	sub x5, x5, #1
 	b heapsort2	
 	
@@ -124,8 +124,9 @@ heapsort4: //
 	b heapsort3
 
 heapsort5: //store the top of the heap
+	mov x11, x9
 	str w7, [x2, x9, lsl #2]
-	
+
 move_matrix_lines:
 	
 	b heapsort0
