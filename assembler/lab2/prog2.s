@@ -14,8 +14,6 @@ matrix: //;matrix
 	.word  34, 44, 67, 88, 5
 	.word  3, 23, 74, 7, 4
 
-sort_mins:
-	.skip 40
 mins:
 	.skip 40
 	.text
@@ -28,14 +26,13 @@ _start:
 	ldr w0, [x5]
 	adr x5, num_rows
 	ldr w1, [x5]
-	adr x2, sort_mins
-	adr x13, mins
+	adr x2, mins
 	adr x3, matrix
 	mov x4, x3
 	mov x5, #0 // i
 	mov x6, #0 // j
 
-//finding sort_mins for each line
+//finding mins for each line
  process_line:
 	cmp x5, x0
 	bge reset_index //
@@ -59,35 +56,37 @@ process_first_elem:
 
 reset_index:
 	str w7, [x2, x6, lsl #2] //str x3, x7 
-	str w7, [x13, x6, lsl #2]
 	add x4, x4, x5, lsl #2
 	mov x5, #0
 	add x6, x6, #1
 	cmp x6, x1
-	bge heapsort_set_index
+	bge heapsort_set_matr
 	b process_line
 
-//sort the array of the sort_mins
+//sort the array of the mins
+heapsort_set_matr:
+	mov x4, x3 //beginning of the matrix
+
 heapsort_set_index:
 	lsr x5, x1, #1 //get i = size / 2
 	sub x6, x1, #1
 	
-heapsort0:
-	cbz x5, heapsort1 //if(x5 == 0) => heapsort1
+heapsort0: //beginning of the sort
+	cbz x5, heapsort1
 	sub x5, x5, #1
 	b heapsort2	
 	
-heapsort1: //store top of the heap
-	cbz x6, prepare_to_move //if(sort_mins.length == 0) => exit
+heapsort1: //processing last 2 elems
+	cbz x6, exit //if(mins.length == 0) => exit
 	ldr w7, [x2, x5, lsl #2]
 	ldr w8, [x2, x6, lsl #2]
 	str w8, [x2, x5, lsl #2]
 	str w7, [x2, x6, lsl #2]
 	sub x6, x6, #1
-	cbz x6, prepare_to_move
+	cbz x6, exit
 
 heapsort2: //load value from index
-	ldr w7, [x2, x5, lsl #2] //get parent tree node, i1 = x5
+	ldr w7, [x2, x5, lsl #2] //get parent tree node
 	mov x10, x5
 
 heapsort3: //
@@ -100,15 +99,14 @@ heapsort3: //
 	beq heapsort4 
 	add x11, x10, #1 //getting index of the right tree node
 	ldr w12, [x2, x11, lsl #2]
-	cmp w8, w12 //if(w8 >= (<=) w12) => heapsort4; i2 = x10
+	cmp w8, w12
 	.ifdef ascending
 	bge heapsort4
 	.else 
 	ble heapsort4
 	.endif
-	add x10, x10, #1 //as a result we have 2 indexes: x5 and x10
+	add x10, x10, #1
 	mov x8, x12
-	//x7 - x5; x8 - x10
 
 heapsort4: //
 	cmp x7, x8
@@ -120,55 +118,12 @@ heapsort4: //
 	str w8, [x2, x9, lsl #2]
 	b heapsort3
 
-heapsort5:
-	str w7, [x2, x9, lsl #2]	
+heapsort5: //store the top of the heap
+	str w7, [x2, x9, lsl #2]
+	
+move_matrix_lines:
+	
 	b heapsort0
-
-prepare_to_move:
-	// x0 - num_column; x1 - num_lines; x2 - sort_mins
-	// x3 - matrix; x13 - mins
-	mov x5, #0 
-	sub x6, x1, #1 //index for sort_mins array
-	mov x7, #0 //index for elems in line
-	ldr w8, [x2, x6, lsl #2]
-
-
-compare_arrays_elems:
-	cmp x6, #0
-	ble exit
-	ldr w9, [x13, x5, lsl #2]
-	cmp x8, x9
-	beq comp_indexes
-	add x5, x5, #1
-	b compare_arrays_elems
-
-comp_indexes:
-	cmp x5, x6
-	beq update_index
-	mul x14, x0, x5
-	mul x15, x0, x6
-	add x14, x3, x14, lsl #2 //get addresses of the lines
-	add x15, x3, x15, lsl #2
-	b move_lines
-
-move_lines:
-	cmp x7, x0
-	bge update_index
-	ldr w10, [x14, x7, lsl #2]
-	ldr w11, [x15, x7, lsl #2]
-	str w10, [x15, x7, lsl #2]
-	str w11, [x14, x7, lsl #2]
-	add x7, x7, #1
-	b move_lines
-
-update_index:
-	sub x6, x6, #1
-	ldr w8, [x2, x6, lsl #2]
-	mov x5, #0
-	mov x7, #0
-	b compare_arrays_elems
-
-
 
 exit:
 	mov x5, #0
