@@ -78,13 +78,13 @@ heapsort0:
 	b heapsort2	
 	
 heapsort1: //store top of the heap
-	cbz x6, exit //if(sort_mins.length == 0) => exit
+	cbz x6, prepare_to_move //if(sort_mins.length == 0) => exit
 	ldr w7, [x2, x5, lsl #2]
 	ldr w8, [x2, x6, lsl #2]
 	str w8, [x2, x5, lsl #2]
 	str w7, [x2, x6, lsl #2]
 	sub x6, x6, #1
-	cbz x6, exit
+	cbz x6, prepare_to_move
 
 heapsort2: //load value from index
 	ldr w7, [x2, x5, lsl #2] //get parent tree node, i1 = x5
@@ -128,7 +128,7 @@ prepare_to_move:
 	// x0 - num_column; x1 - num_lines; x2 - sort_mins
 	// x3 - matrix; x13 - mins
 	mov x5, #0 
-	sub x6, x0, #1 //index for sort_mins array
+	sub x6, x1, #1 //index for sort_mins array
 	mov x7, #0 //index for elems in line
 	ldr w8, [x2, x6, lsl #2]
 
