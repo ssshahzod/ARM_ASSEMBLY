@@ -16,6 +16,8 @@ matrix: //;matrix
 
 mins:
 	.skip 40
+index:
+	.skip 40
 	.text
 	.align 2
 	.global _start
@@ -64,8 +66,26 @@ reset_index:
 	b process_line
 
 //sort the array of the mins
+//also sort array of indexes
+
+
+
+
 heapsort_set_matr:
 	mov x4, x3 //beginning of the matrix
+
+	//prepare indexes to fill index array
+	adr x5, index
+	mov x6, #0
+
+fill_index_array:
+	cmp x6, x0
+	bge heapsort_set_index
+	str w6, [x5, x6, lsl #2]
+	add x6, x6, #1
+	b fill_index_array
+
+
 
 heapsort_set_index:
 	lsr x5, x1, #1 //get i = size / 2
@@ -121,8 +141,7 @@ heapsort4: //
 heapsort5: //store the top of the heap
 	str w7, [x2, x9, lsl #2]
 	
-move_matrix_lines:
-	
+move_matrix_lines:	
 	b heapsort0
 
 exit:
