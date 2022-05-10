@@ -79,7 +79,7 @@ heapsort_set_matr:
 	mov x6, #0
 
 fill_index_array:
-	cmp x6, x0
+	cmp x6, x1
 	bge heapsort_set_index
 	str w6, [x5, x6, lsl #2]
 	add x6, x6, #1
@@ -96,7 +96,7 @@ heapsort0: //beginning of the sort
 	sub x5, x5, #1
 	b heapsort2	
 	
-heapsort1: //processing last 2 elems
+heapsort1: //store top of the heap
 	cbz x6, exit //if(mins.length == 0) => exit
 	ldr w7, [x2, x5, lsl #2]
 	ldr w8, [x2, x6, lsl #2]
