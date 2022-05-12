@@ -69,7 +69,6 @@ reset_index:
 //also sort array of indexes
 heapsort_set_matr:
 	mov x4, x3 //beginning of the matrix
-
 	//prepare indexes to fill index array
 	adr x5, index
 	mov x6, #0
@@ -85,7 +84,7 @@ heapsort_set_index:
 	lsr x5, x1, #1 //get i = size / 2
 	sub x6, x1, #1
 	//x5 - array of indexes
-	
+
 heapsort0: //beginning of the sort
 	cbz x5, heapsort1
 	sub x5, x5, #1
@@ -93,15 +92,15 @@ heapsort0: //beginning of the sort
 	
 heapsort1: //store top of the heap
 	cbz x6, exit //if(mins.length == 0) => exit
-	ldr w7, [x2, x5, lsl #2]
-	ldr w8, [x2, x6, lsl #2]
+	ldrs w7, [x2, x5, lsl #2]
+	ldrs w8, [x2, x6, lsl #2]
 	str w8, [x2, x5, lsl #2]
 	str w7, [x2, x6, lsl #2]
 	sub x6, x6, #1
 	cbz x6, exit
 
 heapsort2: //load value from index
-	ldr w7, [x2, x5, lsl #2] //get parent tree node
+	ldrs w7, [x2, x5, lsl #2] //get parent tree node
 	mov x10, x5
 
 heapsort3: //
@@ -113,7 +112,7 @@ heapsort3: //
 	ldr w8, [x2, x10, lsl #2]
 	beq heapsort4 
 	add x11, x10, #1 //getting index of the right tree node
-	ldr w12, [x2, x11, lsl #2]
+	ldrs w12, [x2, x11, lsl #2]
 	cmp w8, w12
 	.ifdef ascending
 	bge heapsort4
