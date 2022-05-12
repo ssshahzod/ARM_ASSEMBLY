@@ -67,10 +67,6 @@ reset_index:
 
 //sort the array of the mins
 //also sort array of indexes
-
-
-
-
 heapsort_set_matr:
 	mov x4, x3 //beginning of the matrix
 
@@ -85,11 +81,10 @@ fill_index_array:
 	add x6, x6, #1
 	b fill_index_array
 
-
-
 heapsort_set_index:
 	lsr x5, x1, #1 //get i = size / 2
 	sub x6, x1, #1
+	//x5 - array of indexes
 	
 heapsort0: //beginning of the sort
 	cbz x5, heapsort1
