@@ -95,10 +95,12 @@ heapsort1: //store top of the heap
 	cbz x6, exit //if(mins.length == 0) => exit
 	ldrsw x7, [x2, x5, lsl #2]
 	ldrsw x8, [x2, x6, lsl #2]
+
 	ldr w14, [x13, x5, lsl #2]
 	ldr w15, [x13, x6, lsl #2]
 	str w14, [x13, x6, lsl #2]
 	str w15, [x13, x5, lsl #2]
+
 	str w8, [x2, x5, lsl #2]
 	str w7, [x2, x6, lsl #2]
 	sub x6, x6, #1
@@ -106,6 +108,7 @@ heapsort1: //store top of the heap
 
 heapsort2: //load value from index
 	ldrsw x7, [x2, x5, lsl #2] //get parent tree node
+	ldr w14, [x13, x5, lsl #2]
 	mov x10, x5
 
 heapsort3: //
@@ -114,10 +117,12 @@ heapsort3: //
 	add x10, x10, #1 //getting index of the left tree node
 	cmp x10, x6 //if index is greater than max index
 	bgt heapsort5 
-	ldr x8, [x2, x10, lsl #2]
+	ldrsw x8, [x2, x10, lsl #2]
+	ldr w15, [x13, x10, lsl #2]
 	beq heapsort4 
 	add x11, x10, #1 //getting index of the right tree node
 	ldrsw x12, [x2, x11, lsl #2]
+	ldr w16, [x13, x11, lsl #2]
 	cmp w8, w12
 	.ifdef ascending
 	bge heapsort4
@@ -126,6 +131,7 @@ heapsort3: //
 	.endif
 	add x10, x10, #1
 	mov x8, x12
+	mov x15, x16
 
 heapsort4: //
 	cmp x7, x8
@@ -135,10 +141,12 @@ heapsort4: //
 	ble heapsort5
 	.endif
 	str w8, [x2, x9, lsl #2]
+	str w15, [x13, x9, lsl #2]
 	b heapsort3
 
 heapsort5: //store the top of the heap
 	str w7, [x2, x9, lsl #2]
+	str w14, [x13, x9, lsl #2]
 	
 move_matrix_lines:	
 	b heapsort0
