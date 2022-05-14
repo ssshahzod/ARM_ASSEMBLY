@@ -83,6 +83,7 @@ fill_index_array:
 heapsort_set_index:
 	lsr x5, x1, #1 //get i = size / 2
 	sub x6, x1, #1
+	adr x13, index
 	//x5 - array of indexes
 
 heapsort0: //beginning of the sort
@@ -92,15 +93,19 @@ heapsort0: //beginning of the sort
 	
 heapsort1: //store top of the heap
 	cbz x6, exit //if(mins.length == 0) => exit
-	ldrs w7, [x2, x5, lsl #2]
-	ldrs w8, [x2, x6, lsl #2]
+	ldrsw x7, [x2, x5, lsl #2]
+	ldrsw x8, [x2, x6, lsl #2]
+	ldr w14, [x13, x5, lsl #2]
+	ldr w15, [x13, x6, lsl #2]
+	str w14, [x13, x6, lsl #2]
+	str w15, [x13, x5, lsl #2]
 	str w8, [x2, x5, lsl #2]
 	str w7, [x2, x6, lsl #2]
 	sub x6, x6, #1
 	cbz x6, exit
 
 heapsort2: //load value from index
-	ldrs w7, [x2, x5, lsl #2] //get parent tree node
+	ldrsw x7, [x2, x5, lsl #2] //get parent tree node
 	mov x10, x5
 
 heapsort3: //
@@ -109,10 +114,10 @@ heapsort3: //
 	add x10, x10, #1 //getting index of the left tree node
 	cmp x10, x6 //if index is greater than max index
 	bgt heapsort5 
-	ldr w8, [x2, x10, lsl #2]
+	ldr x8, [x2, x10, lsl #2]
 	beq heapsort4 
 	add x11, x10, #1 //getting index of the right tree node
-	ldrs w12, [x2, x11, lsl #2]
+	ldrsw x12, [x2, x11, lsl #2]
 	cmp w8, w12
 	.ifdef ascending
 	bge heapsort4
