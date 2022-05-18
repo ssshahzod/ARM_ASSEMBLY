@@ -18,6 +18,7 @@ mins:
 	.skip 40
 index:
 	.skip 40
+
 	.text
 	.align 2
 	.global _start
@@ -91,8 +92,8 @@ heapsort0: //beginning of the sort
 	sub x5, x5, #1
 	b heapsort2	
 	
-heapsort1: //store top of the heap
-	cbz x6, exit //if(mins.length == 0) => exit
+heapsort1: //
+	cbz x6, set_index_to_move //if(mins.length == 0) => exit
 	ldrsw x7, [x2, x5, lsl #2]
 	ldrsw x8, [x2, x6, lsl #2]
 
@@ -104,7 +105,7 @@ heapsort1: //store top of the heap
 	str w8, [x2, x5, lsl #2]
 	str w7, [x2, x6, lsl #2]
 	sub x6, x6, #1
-	cbz x6, exit
+	cbz x6, set_index_to_move
 
 heapsort2: //load value from index
 	ldrsw x7, [x2, x5, lsl #2] //get parent tree node
@@ -146,10 +147,14 @@ heapsort4: //
 
 heapsort5: //store the top of the heap
 	str w7, [x2, x9, lsl #2]
-	str w14, [x13, x9, lsl #2]
-	
-move_matrix_lines:	
+	str w14, [x13, x9, lsl #2]	
 	b heapsort0
+	
+set_index_to_move:
+	//x0 - x3 are taken
+	adr x4, index
+	
+
 
 exit:
 	mov x5, #0
