@@ -153,11 +153,11 @@ heapsort5: //store the top of the heap
 set_index_to_move:
 	//x0 - x3 are taken (x0 - number of columns, x1 - number of lines, x2 - mins array, x3 - matrix)
 	adr x4, index
-	mov x5, #1 
-	mvn x10, x5
 	mov x5, #0 //number of lines that were read
+	mvn x10, x5
 	mov x6, #0 //index to read index array
 	mov x7, #0 //index to read/store lines
+	mov x12, #0
 
 count_matrix_adr:
 	mul x8, x5, x0
@@ -171,18 +171,18 @@ read_line:
 	b read_line
 
 reset_ind:
-	mov x7, #0
+	mov x6, #0
 find_new_index:
 	cmp x6, x1
 	bge  update_index//index was already used
 	ldrsw x8, [x4, x6, lsl #2]
-	cmp x8, x5
+	cmp x8, x12
 	beq count_new_adr//index found
 	add x6, x6, #1
 	b find_new_index
 
 count_new_adr:
-	str w10, [x4, x6, lsl #2]
+	str w10, [x4, x7, lsl #2]
 	mul x7, x6, x0
 	add x8, x3, x7, lsl #2 
 	mov x7, #0
