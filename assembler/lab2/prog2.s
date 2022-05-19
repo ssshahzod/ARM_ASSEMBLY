@@ -165,8 +165,8 @@ count_matrix_adr:
 read_line:
 	cmp x7, x0
 	bge reset_ind
-	ldrsw x8, [x8, x7, lsl #2]
-	str w8, [x2, x7, lsl #2]
+	ldrsw x9, [x8, x7, lsl #2]
+	str w9, [x2, x7, lsl #2]
 	add x7, x7, #1
 	b read_line
 
@@ -182,21 +182,23 @@ find_new_index:
 	b find_new_index
 
 count_new_adr:
-	str x10, [x4, x6, lsl #2]
-	mul x6, x6, x0
-	add x8, x3, x6, lsl #2 
+	str w10, [x4, x6, lsl #2]
+	mul x7, x6, x0
+	add x8, x3, x7, lsl #2 
+	mov x7, #0
+	mov x12, x6
 
 move_matrix_line:
 	cmp x7, x0
 	bge save_tmp_index
 	ldrsw x9, [x8, x7, lsl #2]
 	ldrsw x6, [x2, x7, lsl #2]
-	str x6, [x8, x7, lsl #2]
-	str x9, [x8, x7, lsl #2]
+	str w6, [x8, x7, lsl #2]
+	str w9, [x2, x7, lsl #2]
+	add x7, x7, #1
 	b move_matrix_line
 
 save_tmp_index:
-	mov x8, x5
 	b reset_ind
 
 update_index:
