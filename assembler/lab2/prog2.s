@@ -154,9 +154,6 @@ heapsort5: //store the top of the heap
 set_index_to_move:
 	//x0 - x3 are taken (x0 - number of columns, x1 - number of lines, x2 - mins array, x3 - matrix)
 	adr x4, index
-	mov x5, #0 //number of lines that were read
-	mov x7, #0 //index to read/store lines
-	mov x12, #0
 	mov x6, #0
 	adr x11, new_matrix
 
@@ -179,9 +176,8 @@ create_matrix:
 	add x7, x7, #1
 	b create_matrix
 
-
 exit:
-	mov x5, #0
+	mov x0, #0
 	mov x8, #93
 	svc #0
 	.size _start, .-_start
