@@ -18,7 +18,8 @@ mins:
 	.skip 40
 index:
 	.skip 40
-
+new_matrix:
+	.skip 80
 	.text
 	.align 2
 	.global _start
@@ -149,15 +150,34 @@ heapsort5: //store the top of the heap
 	str w7, [x2, x9, lsl #2]
 	str w14, [x13, x9, lsl #2]	
 	b heapsort0
-	
+
 set_index_to_move:
 	//x0 - x3 are taken (x0 - number of columns, x1 - number of lines, x2 - mins array, x3 - matrix)
 	adr x4, index
 	mov x5, #0 //number of lines that were read
 	mvn x10, x5
-	mov x6, #0 //index to read index array
 	mov x7, #0 //index to read/store lines
 	mov x12, #0
+	mov x6, #0
+	mul x8, x1, x0
+	adr x10, new_matrix
+
+get_index:
+	cmp x6, x1
+	beq exit
+	ldr w5, [x4, x6, lsl #2]
+	mul x7, x0, x5
+	add x8, x3, x7, lsl #2
+	add x6, x6, #1
+	mov x7, #0
+
+create_matrix:
+	cmp x7, x0
+	beq get_index
+	ldrsw x9, [x8, x7, lsl #2]
+	str w9, [x10, x7, lsl #2]
+	add x7, x7, #1
+	b create_matrix
 
 count_matrix_adr:
 	mul x8, x5, x0
@@ -171,22 +191,22 @@ read_line:
 	b read_line
 
 reset_ind:
-	mov x6, #0
+	mov x7, #0
 find_new_index:
-	cmp x6, x1
+	cmp x7, x0
 	bge  update_index//index was already used
-	ldrsw x8, [x4, x6, lsl #2]
+	ldrsw x8, [x4, x7, lsl #2]
 	cmp x8, x12
 	beq count_new_adr//index found
-	add x6, x6, #1
+	add x7, x7, #1
 	b find_new_index
 
 count_new_adr:
 	str w10, [x4, x7, lsl #2]
-	mul x7, x6, x0
+	mov x12, x7
+	mul x7, x7, x0
 	add x8, x3, x7, lsl #2 
 	mov x7, #0
-	mov x12, x6
 
 move_matrix_line:
 	cmp x7, x0
@@ -199,12 +219,13 @@ move_matrix_line:
 	b move_matrix_line
 
 save_tmp_index:
+	add x5, x5, #1
 	b reset_ind
 
 update_index:
 	cmp x5, x1
 	bge exit
-	add x5, x5, #1
+	mov x12, x5
 	mov x6, #0
 	mov x7, #0
 	b count_matrix_adr
