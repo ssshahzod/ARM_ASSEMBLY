@@ -22,30 +22,43 @@ _start:
 	mov	x0, #0
 	b	8f
 0:
-	mov	x0, #1
+	mov	x0, #1 //file descriptor stdout
 	adr	x1, mes1
 	mov	x2, mes1len
 	mov	x8, #64
 	svc	#0
-	mov	x0, #0
+	mov	x0, #0 //file descriptor stdin
 	adr	x1, name1
 	mov	x2, #1024
 	mov	x8, #63
 	svc	#0
 	cmp	x0, #1
-	ble	1f
+	ble	1f //if error
 	cmp	x0, #1024
 	blt	2f
 
 1:
 	mov	x0, #1
 	b	8f
+2:
+	sub	x2, x0, #1
+	mov	x0, #-100 //open file to read
+	adr	x1, name1
+	strb	wzr, [x1, x2] //move 0-byte to the end of the string
+	mov	x2, #0
+	mov	x8, #56
+	svc	#0
+	cmp	x0, #0
+	bl writeerr //x0 < 0 is error
+	adr	x1, fd1
+	str	x0, [x1]
+	
 8:
 	bl	writeerr
 	mov	x0, #1
 	b	1f
-work:
-    
+
+work:    
 
 8:
 	str	x0, [x29, tmp]
