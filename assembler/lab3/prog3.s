@@ -1,21 +1,32 @@
 	.arch armv8-a
+//	Copy all odd words in each string from file1 to file2
 	.data
 mes1:
 	.string	"Input filename for read\n"
 	.equ	mes1len, .-mes1
+mes2:
+	.string	"Input filename for write\n"
+	.equ	mes2len, .-mes2
+mes3:
+	.string	"File exists. Rewrite(Y/N)?\n"
+	.equ	mes3len, .-mes3
 ans:
 	.skip	3
 name1:
 	.skip	1024
+name2:
+	.skip	1024
 	.align	3
 fd1:
+	.skip	8
+fd2:
 	.skip	8
 	.text
 	.align	2
 	.global _start	
 	.type	_start, %function
 _start:
-	ldr	x0, [sp] //check for cl parameters
+	ldr	x0, [sp]
 	cmp	x0, #1
 	beq	0f
 	mov	x0, #0
@@ -49,18 +60,82 @@ _start:
 	cmp	x0, #0
 	blt	8f
 	adr	x1, fd1
-
-//4:
-
+	str	x0, [x1]
+	mov	x0, #1
+	adr	x1, mes2
+	mov	x2, mes2len
+	mov	x8, #64
+	svc	#0
+	mov	x0, #0
+	adr	x1, name2
+	mov	x2, #1024
+	mov	x8, #63
+	svc	#0
+	cmp	x0, #1
+	ble	3f
+	cmp	x0, #1024
+	bl	4f
 3:
 	mov	x0, #1
 	b	9f
+4:
+	sub	x2, x0, #1
+	mov	x0, #-100
+	adr	x1, name2
+	strb	wzr, [x1, x2]
+	mov	x2, #0xc1
+	mov	x3, #0600
+	mov	x8, #56
+	svc	#0
+	cmp	x0, #0
+	bge	7f
+	cmp	x0, #-17
+	bne	9f
+	mov	x0, #1
+	adr	x1, mes3
+	mov	x2, mes3len
+	mov	x8, #64
+	svc	#0
+	mov	x0, #0
+	adr	x1, ans
+	mov	x2, #3
+	mov	x8, #63
+	svc	#0
+	cmp	x0, #2
+	beq	5f
+	mov	x0, #-17
+	b	9f
+5:
+	adr	x1, ans
+	ldrb	w0, [x1]
+	cmp	w0, 'Y'
+	beq	6f
+	cmp	w0, 'y'
+	beq	6f
+	mov	x0, #-17
+	b	9f
+6:
+	mov	x0, #-100
+	adr	x1, name2
+	mov	x2, #0x201
+	mov	x8, #56
+	svc	#0
+	cmp	x0, #0
+	blt	9f
 7:
+	adr	x1, fd2
+	str	x0, [x1]
 	adr	x0, fd1
 	ldr	x0, [x0]
+	adr	x1, fd2
+	ldr	x1, [x1]
 	bl	work
 	cbnz	x0, 0f
 	adr	x0, fd1
+	ldr	x0, [x0]
+	mov	x8, #57
+	svc	#0
+	adr	x0, fd2
 	ldr	x0, [x0]
 	mov	x8, #57
 	svc	#0
@@ -84,6 +159,10 @@ _start:
 	ldr	x0, [x0]
 	mov	x8, #57
 	svc	#0
+	adr	x0, fd2
+	ldr	x0, [x0]
+	mov	x8, #57
+	svc	#0
 	mov	x0, #1
 1:
 	mov	x8, #93
@@ -91,6 +170,7 @@ _start:
 	.size	_start, .-_start
 	.type	work, %function
 	.equ	f1, 16
+	.equ	f2, 24
 	.equ	tmp, 32
 	.equ	flg, 40
 	.equ	wrd, 44
@@ -104,9 +184,11 @@ work:
 	stp	x29, x30, [sp]
 	mov	x29, sp
 	str	x0, [x29, f1]
+	str	x1, [x29, f2]
 	str	xzr, [x29, flg]
 0:
 	ldr	x0, [x29, f1]
+	add	x1, x29, bufin
 	mov	x2, #4096
 	mov	x8, #63
 	svc	#0
@@ -199,6 +281,9 @@ nofile:
 permission:
 	.string	"Permission denied\n"
 	.equ	permissionlen, .-permission
+exist:
+	.string	"File exists\n"
+	.equ	existlen, .-exist
 isdir:
 	.string	"Is a directory\n"
 	.equ	isdirlen, .-isdir
@@ -229,6 +314,12 @@ writeerr:
 	bne	2f
 	adr	x1, permission
 	mov	x2, permissionlen
+	b	7f
+2:
+	cmp	x0, #-17
+	bne	3f
+	adr	x1, exist
+	mov	x2, existlen
 	b	7f
 3:
 	cmp	x0, #-21
