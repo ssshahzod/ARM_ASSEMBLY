@@ -7,6 +7,7 @@ ASFLAGS = -g
 LDFLAGS = -g -static
 
 SRCS = prog3.s
+#SRCS = progtest.s
 OBJS = $(SRCS:.s=.o)
 
 EXE = prog3
