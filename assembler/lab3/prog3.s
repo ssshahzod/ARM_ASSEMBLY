@@ -4,22 +4,12 @@
 mes1:
 	.string	"Input filename for read\n"
 	.equ	mes1len, .-mes1
-mes2:
-	.string	"Input filename for write\n"
-	.equ	mes2len, .-mes2
-mes3:
-	.string	"File exists. Rewrite(Y/N)?\n"
-	.equ	mes3len, .-mes3
 ans:
 	.skip	3
 name1:
 	.skip	1024
-name2:
-	.skip	1024
 	.align	3
 fd1:
-	.skip	8
-fd2:
 	.skip	8
 	.text
 	.align	2
@@ -47,6 +37,15 @@ _start:
 	cmp	x0, #1024
 	blt	2f
 
+1:
+	mov	x0, #1
+	b	8f
+8:
+	bl	writeerr
+	mov	x0, #1
+	b	1f
+work:
+    
 
 8:
 	str	x0, [x29, tmp]
