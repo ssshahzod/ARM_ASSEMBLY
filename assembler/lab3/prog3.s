@@ -58,6 +58,31 @@ _start:
 	mov	x0, #1
 	b	1f
 
+0:
+	bl	writeerr
+	adr	x0, fd1
+	ldr	x0, [x0]
+	mov	x8, #57
+	svc	#0
+	adr	x0, fd2
+	ldr	x0, [x0]
+	mov	x8, #57
+	svc	#0
+	mov	x0, #1
+1:
+	mov	x8, #93
+	svc	#0
+	.size	_start, .-_start
+	.type	work, %function
+	.equ	f1, 16
+	.equ	f2, 24
+	.equ	tmp, 32
+	.equ	flg, 40
+	.equ	wrd, 44
+	.equ	bufin, 48
+	.equ	bufout, 4144
+	.text
+	.align	2
 work:    
 
 8:
