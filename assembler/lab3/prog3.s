@@ -49,7 +49,7 @@ _start:
 	mov	x8, #56
 	svc	#0
 	cmp	x0, #0
-	bl writeerr //x0 < 0 is error
+	blt writeerr //x0 < 0 is error
 	adr	x1, fd1
 	str	x0, [x1]
 	
@@ -63,7 +63,7 @@ _start:
 	adr	x0, fd1
 	ldr	x0, [x0]
 	mov	x8, #57
-	svc	#0s
+	svc	#0
 	mov	x0, #1
 1:
 	mov	x8, #93
