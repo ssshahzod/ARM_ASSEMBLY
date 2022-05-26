@@ -125,45 +125,39 @@ writeerr:
 	mov	x2, usagelen
 	b	6f
 0:
-	cmp x0, #0
-	bne 1f
-	adr x1, usage
-	mov x2, usagelen
-	b 	7f
-1:
 	cmp	x0, #-2
-	bne	2f
+	bne	1f
 	adr	x1, nofile
 	mov	x2, nofilelen
-	b	7f
-2:
+	b	6f
+1:
 	cmp	x0, #-13
-	bne	3f
+	bne	2f
 	adr	x1, permission
 	mov	x2, permissionlen
-	b	7f
-3:
+	b	6f
+2:
 	cmp	x0, #-21
-	bne	4f
+	bne	3f
 	adr	x1, isdir
 	mov	x2, isdirlen
-	b 	7f
-4:
+	b 	6f
+3:
 	cmp	x0, #-36
-	bne	5f
+	bne	4f
 	adr	x1, toolong
 	mov	x2, toolonglen
-	b	7f
-5:
+	b	6f
+4:
 	cmp	x0, #1
-	bne	6f
+	bne	5f
 	adr	x1, readerror
 	mov	x2, readerrorlen
-	b	7f
-6:
+	b	6f
+5:
 	adr	x1, unknown
 	mov	x2, unknownlen
-7:
+6:
 	mov	x0, #2
 	mov	x8, #64
 	svc	#0
