@@ -63,11 +63,7 @@ _start:
 	adr	x0, fd1
 	ldr	x0, [x0]
 	mov	x8, #57
-	svc	#0
-	adr	x0, fd2
-	ldr	x0, [x0]
-	mov	x8, #57
-	svc	#0
+	svc	#0s
 	mov	x0, #1
 1:
 	mov	x8, #93
@@ -92,11 +88,8 @@ work:
 	mov	x8, #46
 	svc	#0
 	ldr	x0, [x29, tmp]
-9:
-	ldp	x29, x30, [sp]
-	mov	x16, #8240
-	add	sp, sp, x16
-	ret
+
+
 	.size	work, .-work
 	.type	writeerr, %function
 	.data
