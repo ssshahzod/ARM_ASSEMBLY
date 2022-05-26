@@ -52,6 +52,8 @@ _start:
 	blt writeerr //x0 < 0 is error
 	adr	x1, fd1
 	str	x0, [x1]
+	bl work
+
 	
 8:
 	bl	writeerr
@@ -79,7 +81,8 @@ _start:
 	.equ	bufout, 4144
 	.text
 	.align	2
-work:    
+work: 
+
 
 8:
 	str	x0, [x29, tmp]
@@ -122,39 +125,45 @@ writeerr:
 	mov	x2, usagelen
 	b	6f
 0:
+	cmp x0, #0
+	bne 1f
+	adr x1, usage
+	mov x2, usagelen
+	b 	7f
+1:
 	cmp	x0, #-2
-	bne	1f
+	bne	2f
 	adr	x1, nofile
 	mov	x2, nofilelen
-	b	6f
-1:
+	b	7f
+2:
 	cmp	x0, #-13
-	bne	2f
+	bne	3f
 	adr	x1, permission
 	mov	x2, permissionlen
-	b	6f
-2:
+	b	7f
+3:
 	cmp	x0, #-21
-	bne	3f
+	bne	4f
 	adr	x1, isdir
 	mov	x2, isdirlen
-	b	6f
-3:
+	b 	7f
+4:
 	cmp	x0, #-36
-	bne	4f
+	bne	5f
 	adr	x1, toolong
 	mov	x2, toolonglen
-	b	6f
-4:
+	b	7f
+5:
 	cmp	x0, #1
-	bne	5f
+	bne	6f
 	adr	x1, readerror
 	mov	x2, readerrorlen
-	b	6f
-5:
+	b	7f
+6:
 	adr	x1, unknown
 	mov	x2, unknownlen
-6:
+7:
 	mov	x0, #2
 	mov	x8, #64
 	svc	#0
