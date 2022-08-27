@@ -58,7 +58,7 @@ work:
         //prepare new stackframe
         mov     x16, #4128
         sub     sp, sp, x16
-        
+        //save 
         stp     x29, x30, [sp]
         mov     x29, sp
         str     x0, [x29, filename]
@@ -90,7 +90,7 @@ work:
         mov     x8, #63
         svc     #0
         cmp     x0, #0
-        beq     9f //write to stdout and close file
+        beq     9f //close file
         bgt     2f
 
         str     x0, [sp, #-16]!
@@ -104,7 +104,7 @@ work:
 2:
         mov 	x4, x1 //beginning of the word
         ldrb 	w8, [x1], #1
-        cbz 	w8, 8f 
+        cbz 	w8, 8f //write to stdout
         cmp 	w8, '\t'
         beq 	2b  
         cmp 	w8, '\n'
@@ -151,16 +151,15 @@ work:
 	
 8:
 		//close the string
-		mov 	w13, '\n'
 		strb 	w12, [x3, #-1]!
-		strb 	w13, [x3, #1]!
 		strb	wzr, [x3, #1]!
-		//write the text to stdout
-		mov     x2, x0
+        //write the text to stdout
+        mov     x2, x0
         mov     x0, #1
         mov 	x1, x20
         mov     x8, #64
         svc     #0
+        b       1b
 9:
         //close the file
         ldr     x0, [x29, fd]

@@ -1,0 +1,4 @@
+file /home/students/t/tuichiev.ss/asmForTests/a.out
+target remote:30068
+tui enable
+tui reg general

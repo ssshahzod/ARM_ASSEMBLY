@@ -1,26 +1,11 @@
 	.arch armv8-a
-//	Copy all odd words in each string from file1 to file2
 	.data
 mes1:
-	.string	"Input filename for read\n"
+	.string	"Input the x: "
 	.equ	mes1len, .-mes1
 mes2:
-	.string	"Input filename for write\n"
+	.string	"Input the precision: "
 	.equ	mes2len, .-mes2
-mes3:
-	.string	"File exists. Rewrite(Y/N)?\n"
-	.equ	mes3len, .-mes3
-ans:
-	.skip	3
-name1:
-	.skip	1024
-name2:
-	.skip	1024
-	.align	3
-fd1:
-	.skip	8
-fd2:
-	.skip	8
 	.text
 	.align	2
 	.global _start	
@@ -179,120 +164,14 @@ _start:
 	.text
 	.align	2
 work:
-	mov	x16, #8240
-	sub	sp, sp, x16
-	stp	x29, x30, [sp]
-	mov	x29, sp
-	str	x0, [x29, f1]
-	str	x1, [x29, f2]
-	str	xzr, [x29, flg]
-0:
-	ldr	x0, [x29, f1]
-	add	x1, x29, bufin
-	mov	x2, #4096
-	mov	x8, #63
-	svc	#0
-	cmp	x0, #0
-	blt	8f
-	beq	9f
-	add	x0, x0, x29
-	add	x0, x0, bufin
-	ldr	w1, [x29, flg]
-	add	x3, x29, bufin
-	mov	x16, bufout
-	add	x4, x29, x16
-	ldr	w5, [x29, wrd]
-	mov	w6, ' '
-1:
-	cmp	x3, x0
-	bge	6f
-	ldrb	w2, [x3], #1
-	cbz	w2, 2f
-	cmp	w2, '\n'
-	beq	2f
-	cmp	w2, ' '
-	beq	3f
-	cmp	w2, '\t'
-	beq	3f
-	cbz	w1, 4f
-	tbz	w5, #0, 1b
-	b	5f
-2:
-	mov	w1, #0
-	mov	w5, #0
-	b	5f
-3:
-	mov	w1, #0
-	b	1b
-4:
-	add	w5, w5, #1
-	mov	w1, #1
-	tbz	w5, #0, 1b
-	cmp	w5, #1
-	beq	5f
-	strb	w6, [x4], #1
-5:
-	strb	w2, [x4], #1
-	b	1b
-6:
-	str	w1, [x29, flg]
-	str	w5, [x29, wrd]
-	mov	x16, bufout
-	add	x1, x29, x16
-	sub	x2, x4, x1
-	cbz	x2, 0b
-	str	x2, [x29, tmp]
-7:
-	ldr	x0, [x29, f2]
-	mov	x8, #64
-	svc	#0
-	cmp	x0, #0
-	blt	8f
-	ldr	x2, [x29, tmp]
-	cmp	x0, x2
-	beq	0b
-	mov	x16, bufout
-	add	x1, x29, x16
-	add	x1, x1, x0
-	sub	x2, x2, x0
-	str	x2, [x29, tmp]
-	b	7b
-8:
-	str	x0, [x29, tmp]
-	ldr	x0, [x29, f2]
-	mov	x1, #0
-	mov	x8, #46
-	svc	#0
-	ldr	x0, [x29, tmp]
-9:
-	ldp	x29, x30, [sp]
-	mov	x16, #8240
-	add	sp, sp, x16
 	ret
 	.size	work, .-work
+	
 	.type	writeerr, %function
 	.data
 usage:
 	.string	"Program does not require parameters\n"
 	.equ	usagelen, .-usage
-nofile:
-	.string	"No such file or directory\n"
-	.equ	nofilelen, .-nofile
-permission:
-	.string	"Permission denied\n"
-	.equ	permissionlen, .-permission
-exist:
-	.string	"File exists\n"
-	.equ	existlen, .-exist
-isdir:
-	.string	"Is a directory\n"
-	.equ	isdirlen, .-isdir
-toolong:
-	.string	"File name too long\n"
-	.equ	toolonglen, .-toolong
-readerror:
-	.string "Error readig filename\n"
-	.equ	readerrorlen, .-readerror
 unknown:
 	.string	"Unknown error\n"
 	.equ	unknownlen, .-unknown
@@ -310,36 +189,6 @@ writeerr:
 	mov	x2, nofilelen
 	b	7f
 1:
-	cmp	x0, #-13
-	bne	2f
-	adr	x1, permission
-	mov	x2, permissionlen
-	b	7f
-2:
-	cmp	x0, #-17
-	bne	3f
-	adr	x1, exist
-	mov	x2, existlen
-	b	7f
-3:
-	cmp	x0, #-21
-	bne	4f
-	adr	x1, isdir
-	mov	x2, isdirlen
-	b	7f
-4:
-	cmp	x0, #-36
-	bne	5f
-	adr	x1, toolong
-	mov	x2, toolonglen
-	b	7f
-5:
-	cmp	x0, #1
-	bne	6f
-	adr	x1, readerror
-	mov	x2, readerrorlen
-	b	7f
-6:
 	adr	x1, unknown
 	mov	x2, unknownlen
 7:
