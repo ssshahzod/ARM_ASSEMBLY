@@ -9,4 +9,6 @@
 .inputrc
 .lesshst
 .viminfo
-asmForTests
+.vim
+.gitconfig
+.qemuport
