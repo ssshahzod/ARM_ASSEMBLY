@@ -1,12 +1,11 @@
 	.arch armv8-a
-//	Compare exponent from mathlib and my own implementation
 	.data
 mes1:
 	.string	"Input x\n"
 mes2:
-	.string	"%lf"
+	.string	"%lf" //input format
 mes3:
-	.string	"exp(%.17g)=%.17g\n"
+	.string	"cos(%.17g) = %.17g\n"
 mes4:
 	.string	"myexp(%.17g)=%.17g\n"
 mes5:

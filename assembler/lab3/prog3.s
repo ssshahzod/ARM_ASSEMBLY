@@ -1,5 +1,5 @@
         .arch armv8-a
-//      Print text file
+        
         .data
 errmes1:
         .string "Usage: "
