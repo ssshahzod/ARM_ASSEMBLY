@@ -1,30 +1,32 @@
-CROSS_COMPILE ?= aarch64-linux-gnu-
+#CROSS_COMPILE ?= aarch64-linux-gnu-
 
-PREFIX = /usr/local/arm64
+#PREFIX = /usr/local/arm64
+#OBJPATH2 = /usr/lib64
 
-AS = $(CROSS_COMPILE)as
-LD = $(CROSS_COMPILE)ld
+#AS = $(CROSS_COMPILE)as
+#LD = $(CROSS_COMPILE)ld
 
-ASFLAGS = -g
-LDFLAGS = -g -static
-LIBPATH = -L $(PREFIX)/lib/gcc/aarch64-linux-gnu/7.5.0 -L $(PREFIX)/aarch64-linux-gnu/libc/usr/lib
-OBJPATH = $(PREFIX)/aarch64-linux-gnu/libc/usr/lib
-LIBS = -Lgcc -lgcc_eh -lc -lm
+#ASFLAGS = -g
+#LDFLAGS = -g -static
+#LIBPATH = -L $(PREFIX)/lib/gcc/aarch64-linux-gnu/7.5.0 -L $(PREFIX)/aarch64-linux-gnu/libc/usr/lib
+#OBJPATH = $(PREFIX)/aarch64-linux-gnu/libc/usr/lib
+#LIBS = -lgcc -lgcc_eh -lc -lm
 #PREOBJ = $(OBJPATH)/crt1.o $(OBJPATH)/crti.o
 #POSTOBJ = $(OBJPATH)/crtn.o
 
-SRCS = prog4.s
-OBJS = $(SRCS:.s=.o)
+#SRCS = prog14.s
+#OBJS = $(SRCS:.s=.o)
+CC  := aarch64-linux-gnu-gcc
+EXE := prog4
+build: *.s
+	$(CC) -g -static -o $(EXE) $^ -lm
+#all: $(SRCS) $(EXE)
 
-EXE = prog4
+#clean:
+#	rm -rf $(EXE) $(OBJS)
 
-all: $(SRCS) $(EXE)
+#$(EXE): $(OBJS)
+#	$(LD) $(LDFLAGS) $(LIBPATH) $(PREOBJ) $(OBJS) $(POSTOBJ) -\( $(LIBS) -\) -o $@
 
-clean:
-	rm -rf $(EXE) $(OBJS)
-
-$(EXE): $(OBJS)
-	$(LD) $(LDFLAGS) $(LIBPATH) $(PREOBJ) $(OBJS) $(POSTOBJ) -\( $(LIBS) -\) -o $@
-
-.s.o:
-	$(AS) $(ASFLAGS) $< -o $@
+#.s.o:
+#	$(AS) $(ASFLAGS) $< -o $@
