@@ -21,23 +21,32 @@ cos:
 	//d7 - precision d0 - x
 	//ldr 	x11, [sp, filename]
 	mov 	x10, #0
-	fmov	d9, #1.0
 	fmov	d5, #1.0
-	fmov	d6, #-1.0
-	fmov	d1, d5
-	fmov	d2, d5
-	fmov	d3, d5
+	fmov 	d2, #1.0
+	fmov	d1, d2
+	fadd	d10, d1, d2
+	fadd	d3, d1, d2
 0:
 	add		x10, x10, #1
 	fmov	d4, d2 //previous sum
-	fmul	d1, d1, d0 //store multiplication
-	fdiv	d1, d1, d3
-	fadd	d2, d2, d1
-	fadd	d3, d3, d5 //factorial
-	fcmp	d2, d4
-	bne	0b
+	
+	fmul	d1, d0, d0 //store multiplication
+	fmov	d6, d1 //save abs value
+	fneg 	d1, d1
+	b 3f
+2:
+	fdiv	d1, d1, d3  //divide to factorial
+	fadd	d4, d4, d1 
+	
+	fadd	d10, d10, d5
+	fmul	d3,	d3, d10
+	fadd	d10, d10, d5
+	fmul	d3, d3, d10
+3:
+	fsub	d8, d2, d4
+	fcmp	d8, d7
+	bgt		0b
 	fmov	d0, d2
-	//str 	x10, [x29, p] //return counter number for testing
 	ret
 	.size	cos, .-cos
 	.global	main
