@@ -12,7 +12,6 @@ mode:
 	.string "w"
 filestr:
 	.string "%d:  %.17g"
-
 testmes:
 	.string "Filename entered: %s\n"
 usagemes:
@@ -24,33 +23,35 @@ usagemes:
 cos:
 	//d7 - precision d0 - x
 	//ldr 	x11, [sp, filename]
-	mov 	x10, #0
+	ldr 	x0, [sp, filestruct]
+	mov 	x1, #0
 	fmov	d5, #1.0
-	fmov 	d2, #1.0
-	fmov	d1, d2
-	fadd	d10, d1, d2
-	fadd	d3, d1, d2
+	fmov	d2, d0
+	fmov 	d0, #1.0
+	fmov	d1, d0
+	fadd	d10, d1, d0
+	fadd	d3, d1, d0
 0:
-	add		x10, x10, #1
-	fmov	d4, d2 //previous sum
+	add		x1, x1, #1
+	fmov	d4, d0 //previous sum
 	
-	fmul	d1, d0, d0 //store multiplication
+	fmul	d1, d2, d2 //store multiplication
 	fmov	d6, d1 //save abs value
-	fneg 	d1, d1
-	b 3f
-2:
+1:
 	fdiv	d1, d1, d3  //divide to factorial
-	fadd	d2, d2, d1 
+	fneg 	d1, d1
+	fadd	d0, d0, d1 
 	
 	fadd	d10, d10, d5
 	fmul	d3,	d3, d10
 	fadd	d10, d10, d5
 	fmul	d3, d3, d10
-3:
-	fsub	d8, d4, d2
+2:
+	fsub	d8, d4, d6
 	fcmp	d8, d7
+	//fwrite here, debug calculations
 	bgt		0b
-	fmov	d0, d2
+	//fmov	d2, d0
 	ret
 	.size	cos, .-cos
 	.global	main
