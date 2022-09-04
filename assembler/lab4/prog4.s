@@ -11,7 +11,7 @@ mes3:
 mode:
 	.string "w"
 filestr:
-	.string "%d:  %.17g"
+	.string "%d:  %.17g\n"
 testmes:
 	.string "Filename entered: %s\n"
 usagemes:
@@ -25,17 +25,15 @@ cos:
 	//ldr 	x11, [sp, filename]
 	ldr 	x0, [sp, filestruct]
 	mov 	x1, #0
-	fmov	d5, #1.0
-	fmov	d2, d0
-	fmov 	d0, #1.0
 	fmov	d1, d0
+	fmov 	d0, #1.0
+	fmov 	d5, d0
 	fadd	d10, d1, d0
 	fadd	d3, d1, d0
 0:
 	add		x1, x1, #1
 	fmov	d4, d0 //previous sum
-	
-	fmul	d1, d2, d2 //store multiplication
+	fmul	d1, d1, d1 //store multiplication
 	fmov	d6, d1 //save abs value
 1:
 	fdiv	d1, d1, d3  //divide to factorial
@@ -46,12 +44,16 @@ cos:
 	fmul	d3,	d3, d10
 	fadd	d10, d10, d5
 	fmul	d3, d3, d10
+	
 2:
-	fsub	d8, d4, d6
+	fsub	d8, d4, d0
 	fcmp	d8, d7
 	//fwrite here, debug calculations
+	//d0 - current sum
+	//adr x0, filestr
+	//bl fprintf
 	bgt		0b
-	//fmov	d2, d0
+	fmov	d0, d4
 	ret
 	.size	cos, .-cos
 	.global	main
@@ -70,11 +72,6 @@ main:
 //	ldr x20, [sp, #16] //store name of the file
 //	str x20, [sp, filename]
 
-//	test filename
-//	adr x0, testmes
-// 	ldr x1, [x1, #8]
-//	bl printf
-
 	ldr x0, [x1]
 	str x0, [sp, progname]
 	ldr x0, [x1, #8]
@@ -90,9 +87,6 @@ main:
 	
 1:
 	str x0, [sp, filestruct]
-	//test file writing
-	adr	x1, mes1
-	bl fprintf
 	
 	adr x0, mes1
 	bl	printf
