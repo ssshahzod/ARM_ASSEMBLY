@@ -32,7 +32,7 @@ int main(int argc, char **argv) {
 int work(char *input, char *output) {
     int w, h;
     unsigned char *data = stbi_load(input, &w, &h, NULL, 3);
-    
+
     if (data == NULL) {
         puts(stbi_failure_reason());
         return 1;
@@ -49,12 +49,12 @@ int work(char *input, char *output) {
     #else
         process(extended, copy, w + 2, h + 2);
     #endif
-    
+
     clock_t end = clock();
     // printf("processing time: %lf\n", time_spent);
     printf("%lf", (double)(end - begin) / CLOCKS_PER_SEC);
     fflush(stdout);
-    
+
     if (stbi_write_png(output, w, h, 3, copy + (w+2)*3+3, (w+2)*3) == 0) {
     // if (stbi_write_png(output, w + 2, h + 2, 3, copy, 0) == 0) {
         puts("Some png writing error\n");
@@ -104,30 +104,55 @@ uint8_t* extend(uint8_t *image, uint32_t w, uint32_t h) {
     return extended;
 }
 
+//process one pixel
 static inline int process_one(uint8_t *image, int index, int line) {
-    return (
-          4 * (int)image[index]
-        + 2 * (int)image[index - 3]
-        + 2 * (int)image[index + 3]
-        +     (int)image[index - line - 3]
-        + 2 * (int)image[index - line]
-        +     (int)image[index - line + 3]
-        +     (int)image[index + line - 3]
-        + 2 * (int)image[index + line]
-        +     (int)image[index + line + 3]
-    ) / 16;
+    return ();
 }
+
+static inline int grey(int max, int min){
+    retun (max + min) / 2;
+}
+
+static inline int getMin(uint8_t *image, int index, int line){
+    int tmp = image[index];
+    if(tmp > image[index + 1]){
+        tmp = image[index + 1];
+    }
+
+    if(tmp > image[index + 2]){
+        tmp = image[index + 2];
+    }
+    return tmp;
+}
+
+static inline int getMax(uint8_t *image, int index, int line){
+    int tmp = image[index];
+    if(tmp < image[index + 1]){
+        tmp = image[index + 1];
+    }
+
+    if(tmp < image[index + 2]){
+        tmp = image[index + 2];
+    }
+    return tmp;
+}
+
 
 void process(uint8_t *image, uint8_t *copy, uint32_t w, uint32_t h) {
     int line = w * 3;
-
+    int max, min;
     register int i = line + 3;
 
-    for (register int y = 1; y < h - 1; ++y) {
-        for (register int x = 1; x < w - 1; ++x, i += 3) {
-            copy[i] = process_one(image, i, line);
-            copy[i+1] = process_one(image, i+1, line);
-            copy[i+2] = process_one(image, i+2, line);
+    for (register int y = 1; y < h; ++y){
+        for (register int x = 1; x < w; ++x, i += 3) {
+            max = getMax(image, i, line);
+            min = getMin(image, i, line);
+            //copy[i] = process_one(image, i, line); //process red
+            //copy[i+1] = process_one(image, i+1, line); //process green
+            //copy[i+2] = process_one(image, i+2, line); //process blue
+            copy[i] = grey(max, min);
+            copy[i + 1] = grey(max, min);
+            copy[i + 2] = grey(max, min);
         }
     }
 }
