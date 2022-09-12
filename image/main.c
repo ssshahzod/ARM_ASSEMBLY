@@ -105,14 +105,9 @@ uint8_t* extend(uint8_t *image, uint32_t w, uint32_t h) {
 }
 
 //process one pixel
-static inline int process_one(uint8_t *image, int index, int line) {
-    return 0;
-}
-
 static inline int grey(int max, int min){
     return (max + min) / 2;
 }
-
 static inline int getMin(uint8_t *image, int index, int line){
     int tmp = image[index];
     if(tmp > image[index + 1]){
@@ -124,7 +119,6 @@ static inline int getMin(uint8_t *image, int index, int line){
     }
     return tmp;
 }
-
 static inline int getMax(uint8_t *image, int index, int line){
     int tmp = image[index];
     if(tmp < image[index + 1]){
