@@ -1,4 +1,3 @@
-
     .arch armv8-a
 
     .text
@@ -6,6 +5,7 @@
 
     .global process_asm
     .type process_asm, %function
+
 process_asm:
     // x0 = uint8_t *image
     // x1 = uint8_t *copy
@@ -20,117 +20,73 @@ process_asm:
     add x1, x1, x4
     add x1, x1, #3 
 
-    sub w3, w3, #1 // height -= 1
-    sub w2, w2, #1 // width -= 1
+    //sub w3, w3, #1 // height -= 1
+    //sub w2, w2, #1 // width -= 1
 
     mov x5, x0 // i = &image[0]
     mov x6, #1 // y = 1
-    rows:
-        cmp x6, x3
-        bge exit_process_arm
 
-        mov x7, #1 // x = 1
-        pixels:
-            cmp x7, x2
-            bge end_pixels
+rows:
+    cmp x6, x3
+    bge exit_process_arm
 
-            // R
-            ldrb w8, [x0]
-            lsl w8, w8, 2
+    mov x7, #1 // x = 1
 
-            sub x10, x0, x4 // index - line
-            ldrb w9, [x10, #3]
-            add w8, w8, w9
-            ldrb w9, [x10]
-            add w8, w8, w9, lsl 1
-            ldrb w9, [x10, #-3]
-            add w8, w8, w9
+pixels1:
+    cmp x7, x2
+    bge end_pixels
 
-            ldrb w9, [x0, #3]
-            add w8, w8, w9, lsl 1
-            ldrb w9, [x0, #-3]
-            add w8, w8, w9, lsl 1
+    ldrb w8, [x5], #1 //read R, G, B in w8, w9, w10
+    ldrb w9, [x5], #1
+    ldrb w10, [x5], #1
+    mov w11, w8 //store max here
+    mov w12, w9 //store min here
+    b max
+max:
+    cmp w9, w11
+    bge max1
+1:
+    cmp w11, w10
+    bge max2
+    b min
+max1:
+    mov w11, w9
+    b 1b
+max2:
+    mov w11, w10
+    b min
 
-            add x10, x0, x4 // index + line
-            ldrb w9, [x10, #3]
-            add w8, w8, w9
-            ldrb w9, [x10]
-            add w8, w8, w9, lsl 1
-            ldrb w9, [x10, #-3]
-            add w8, w8, w9
+min:
+    cmp w8, w12
+    blt min1
+1:
+    cmp w12, w10
+    bge min2
+    ;b nextStep
+min1:
+    mov w12, w8
+    b 1b
+min2:
+    mov w12, w10
 
-            lsr w8, w8, #4 // value/16
-            strb w8, [x1]
-            add x0, x0, #1
-            add x1, x1, #1
+gray:
+    //w11 - max
+    //w12 - min
+    //w13 - gray res
+    add w11, w11, w12
+    div w11, w11, #2
 
-            // G
-            ldrb w8, [x0]
-            lsl w8, w8, 2
+    sub x5, x5, #3 // index - line
+    strb w11, [x1], #1
+    strb w11, [x1], #1
+    strb w11, [x1], #1
+    b pixels1
+	
+end_pixels:
 
-            sub x10, x0, x4 // index - line
-            ldrb w9, [x10, #3]
-            add w8, w8, w9
-            ldrb w9, [x10]
-            add w8, w8, w9, lsl 1
-            ldrb w9, [x10, #-3]
-            add w8, w8, w9
-
-            ldrb w9, [x0, #3]
-            add w8, w8, w9, lsl 1
-            ldrb w9, [x0, #-3]
-            add w8, w8, w9, lsl 1
-
-            add x10, x0, x4 // index + line
-            ldrb w9, [x10, #3]
-            add w8, w8, w9
-            ldrb w9, [x10]
-            add w8, w8, w9, lsl 1
-            ldrb w9, [x10, #-3]
-            add w8, w8, w9
-
-            lsr w8, w8, #4 // value/16
-            strb w8, [x1]
-            add x0, x0, #1
-            add x1, x1, #1
-
-            // B
-            ldrb w8, [x0]
-            lsl w8, w8, 2
-
-            sub x10, x0, x4 // index - line
-            ldrb w9, [x10, #3]
-            add w8, w8, w9
-            ldrb w9, [x10]
-            add w8, w8, w9, lsl 1
-            ldrb w9, [x10, #-3]
-            add w8, w8, w9
-
-            ldrb w9, [x0, #3]
-            add w8, w8, w9, lsl 1
-            ldrb w9, [x0, #-3]
-            add w8, w8, w9, lsl 1
-
-            add x10, x0, x4 // index + line
-            ldrb w9, [x10, #3]
-            add w8, w8, w9
-            ldrb w9, [x10]
-            add w8, w8, w9, lsl 1
-            ldrb w9, [x10, #-3]
-            add w8, w8, w9
-
-            lsr w8, w8, #4 // value/16
-            strb w8, [x1]
-            add x0, x0, #1
-            add x1, x1, #1
-
-            add x7, x7, #1
-            b pixels
-        end_pixels:
-
-        add x6, x6, #1
-        b rows
-    exit_process_arm:
+    add x6, x6, #1
+    b rows
+	
+exit_process_arm:
     ret
-
     .size   process_asm, (. - process_asm)
