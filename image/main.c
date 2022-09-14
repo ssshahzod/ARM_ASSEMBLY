@@ -108,6 +108,7 @@ uint8_t* extend(uint8_t *image, uint32_t w, uint32_t h) {
 static inline int grey(int max, int min){
     return (max + min) / 2;
 }
+
 static inline int getMin(uint8_t *image, int index, int line){
     int tmp = image[index];
     if(tmp > image[index + 1]){
@@ -119,6 +120,7 @@ static inline int getMin(uint8_t *image, int index, int line){
     }
     return tmp;
 }
+
 static inline int getMax(uint8_t *image, int index, int line){
     int tmp = image[index];
     if(tmp < image[index + 1]){
@@ -141,9 +143,9 @@ void process(uint8_t *image, uint8_t *copy, uint32_t w, uint32_t h) {
         for (register int x = 1; x < w; ++x, i += 3) {
             max = getMax(image, i, line);
             min = getMin(image, i, line);
-            //copy[i] = process_one(image, i, line); //process red
-            //copy[i+1] = process_one(image, i+1, line); //process green
-            //copy[i+2] = process_one(image, i+2, line); //process blue
+            //i - process red
+            //i + 1 - process green
+            //i + 2 - process blue
             copy[i] = grey(max, min);
             copy[i + 1] = grey(max, min);
             copy[i + 2] = grey(max, min);

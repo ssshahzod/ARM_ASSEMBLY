@@ -1,4 +1,3 @@
-
     .arch armv8-a
 
     .text
@@ -18,10 +17,10 @@ process_asm:
     add x0, x0, x4
     add x0, x0, #3  // index = &image[line + 3]
     add x1, x1, x4
-    add x1, x1, #3 
+    add x1, x1, #3
 
-    sub w3, w3, #1 // height -= 1
-    sub w2, w2, #1 // width -= 1
+    //sub w3, w3, #1 // height -= 1
+    //sub w2, w2, #1 // width -= 1
 
     mov x5, x0 // i = &image[0]
     mov x6, #1 // y = 1
