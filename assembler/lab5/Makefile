@@ -3,6 +3,8 @@ AS       := aarch64-linux-gnu-as
 LD       := aarch64-linux-gnu-ld
 FLAGS 	 := -g -static
 
+OPTIMIZATION = -O2
+
 .PHONY: default
 default: build
 

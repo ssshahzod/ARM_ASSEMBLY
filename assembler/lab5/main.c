@@ -52,7 +52,7 @@ int work(char *input, char *output) {
 
     clock_t end = clock();
     // printf("processing time: %lf\n", time_spent);
-    printf("%lf", (double)(end - begin) / CLOCKS_PER_SEC);
+    printf("%lf \n", (double)(end - begin) / CLOCKS_PER_SEC);
     fflush(stdout);
 
     if (stbi_write_png(output, w, h, 3, copy + (w+2)*3+3, (w+2)*3) == 0) {
@@ -69,13 +69,11 @@ int work(char *input, char *output) {
 
 uint8_t* extend(uint8_t *image, uint32_t w, uint32_t h) {
     uint8_t *extended = malloc((w + 2) * (h + 2) * 3);
-
     int line1 = w * 3;
     int line2 = (w + 2) * 3;
-
     register int i1 = 0;
     register int i2 = line2 + 1 * 3;
-
+    
     for (register int y = 0; y < h; ++y) {
         for (register int x = 0; x < w; ++x) {
             extended[i2] = image[i1];
@@ -97,7 +95,7 @@ uint8_t* extend(uint8_t *image, uint32_t w, uint32_t h) {
         extended[i1-2] = extended[i1-5];
         extended[i1-1] = extended[i1-4];
     }
-
+    
     memcpy(extended, extended + line2, line2);
     memcpy(extended + line2 * (h + 1), extended + line2 * h, line2);
 
@@ -136,8 +134,8 @@ static inline int getMax(uint8_t *image, int index, int line){
 
 void process(uint8_t *image, uint8_t *copy, uint32_t w, uint32_t h) {
     int line = w * 3;
-    int max, min;
     register int i = line + 3;
+    int max, min;
 
     for (register int y = 1; y < h; ++y){
         for (register int x = 1; x < w; ++x, i += 3) {

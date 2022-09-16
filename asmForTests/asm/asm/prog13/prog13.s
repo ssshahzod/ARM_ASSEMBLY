@@ -10,6 +10,8 @@ mes2:
 mes3:
 	.string	"File exists. Rewrite(Y/N)?\n"
 	.equ	mes3len, .-mes3
+resstr:
+	.skip 4096
 ans:
 	.skip	3
 name1:
@@ -45,15 +47,15 @@ _start:
 	cmp	x0, #1
 	ble	1f
 	cmp	x0, #1024
-	blt	2f
+	sub	x2, x0, #1
+	adr	x1, name1
+	strb	wzr, [x1, x2]
+	mov x0, x1
+	blt work
 1:
 	mov	x0, #1
 	b	8f
 2:
-	sub	x2, x0, #1
-	mov	x0, #-100
-	adr	x1, name1
-	strb	wzr, [x1, x2]
 	mov	x2, #0
 	mov	x8, #56
 	svc	#0
@@ -61,84 +63,84 @@ _start:
 	blt	8f
 	adr	x1, fd1
 	str	x0, [x1]
-	mov	x0, #1
-	adr	x1, mes2
-	mov	x2, mes2len
-	mov	x8, #64
-	svc	#0
-	mov	x0, #0
-	adr	x1, name2
-	mov	x2, #1024
-	mov	x8, #63
-	svc	#0
-	cmp	x0, #1
-	ble	3f
+	//mov	x0, #1
+//	adr	x1, mes2
+	//mov	x2, mes2len
+	//mov	x8, #64
+//	svc	#0
+//	mov	x0, #0
+//	adr	x1, name2
+//	mov	x2, #1024
+//	mov	x8, #63
+//	svc	#0
+//	cmp	x0, #1
+//	ble	3f
 	cmp	x0, #1024
-	bl	4f
+	b	7f
 3:
 	mov	x0, #1
 	b	9f
 4:
-	sub	x2, x0, #1
-	mov	x0, #-100
-	adr	x1, name2
-	strb	wzr, [x1, x2]
-	mov	x2, #0xc1
-	mov	x3, #0600
-	mov	x8, #56
-	svc	#0
-	cmp	x0, #0
-	bge	7f
-	cmp	x0, #-17
-	bne	9f
-	mov	x0, #1
-	adr	x1, mes3
-	mov	x2, mes3len
-	mov	x8, #64
-	svc	#0
-	mov	x0, #0
-	adr	x1, ans
-	mov	x2, #3
-	mov	x8, #63
-	svc	#0
-	cmp	x0, #2
-	beq	5f
+//	sub	x2, x0, #1
+///	mov	x0, #-100
+///	adr	x1, name2
+///	strb	wzr, [x1, x2]
+//	mov	x2, #0xc1
+//	mov	x3, #0600
+///	mov	x8, #56
+//	svc	#0
+	//cmp	x0, #0
+	//bge	7f
+	//cmp	x0, #-17
+	//bne	9f
+	//mov	x0, #1
+	//adr	x1, mes3
+	//mov	x2, mes3len
+	//mov	x8, #64
+	//svc	#0
+	//mov	x0, #0
+	//adr	x1, ans
+	//mov	x2, #3
+	//mov	x8, #63
+	//svc	#0
+	//cmp	x0, #2
+	//beq	5f
 	mov	x0, #-17
 	b	9f
 5:
-	adr	x1, ans
-	ldrb	w0, [x1]
-	cmp	w0, 'Y'
-	beq	6f
-	cmp	w0, 'y'
-	beq	6f
-	mov	x0, #-17
-	b	9f
+	//adr	x1, ans
+	//ldrb	w0, [x1]
+	//cmp	w0, 'Y'
+	//beq	6f
+	//cmp	w0, 'y'
+	//beq	6f
+	//mov	x0, #-17
+	//b	9f
 6:
-	mov	x0, #-100
-	adr	x1, name2
-	mov	x2, #0x201
-	mov	x8, #56
-	svc	#0
-	cmp	x0, #0
-	blt	9f
+	//mov	x0, #-100
+	//adr	x1, name2
+	//mov	x2, #0x201
+	//mov	x8, #56
+	//svc	#0
+//	cmp	x0, #0
+//	blt	9f
 7:
-	adr	x1, fd2
+	//adr	x1, fd2
 	str	x0, [x1]
 	adr	x0, fd1
 	ldr	x0, [x0]
-	adr	x1, fd2
-	ldr	x1, [x1]
+	//adr	x1, fd2
+	//ldr	x1, [x1]
 	bl	work
 	cbnz	x0, 0f
 	adr	x0, fd1
 	ldr	x0, [x0]
 	mov	x8, #57
 	svc	#0
-	adr	x0, fd2
-	ldr	x0, [x0]
-	mov	x8, #57
-	svc	#0
+	//adr	x0, fd2
+	//ldr	x0, [x0]
+	//mov	x8, #57
+	//svc	#0
 	mov	x0, #0
 	b	1f
 8:
@@ -159,10 +161,10 @@ _start:
 	ldr	x0, [x0]
 	mov	x8, #57
 	svc	#0
-	adr	x0, fd2
-	ldr	x0, [x0]
-	mov	x8, #57
-	svc	#0
+	//adr	x0, fd2
+	//ldr	x0, [x0]
+	//mov	x8, #57
+	//svc	#0
 	mov	x0, #1
 1:
 	mov	x8, #93
@@ -171,7 +173,7 @@ _start:
 	.type	work, %function
 	.equ	f1, 16
 	.equ	f2, 24
-	.equ	tmp, 32
+	.equ	buf, 32
 	.equ	flg, 40
 	.equ	wrd, 44
 	.equ	bufin, 48
@@ -179,96 +181,122 @@ _start:
 	.text
 	.align	2
 work:
-	mov	x16, #8240
-	sub	sp, sp, x16
-	stp	x29, x30, [sp]
-	mov	x29, sp
-	str	x0, [x29, f1]
-	str	x1, [x29, f2]
-	str	xzr, [x29, flg]
+    //prepare new stackframe
+    mov     x16, #4128
+    sub     sp, sp, x16
+        
+    stp     x29, x30, [sp]
+    mov     x29, sp
+    str     x0, [x29, f1]
+    mov     x1, x0
+
+    //open file
+    mov     x0, #-100
+    mov     x2, #0
+    mov     x8, #56
+    svc     #0
+    cmp     x0, #0
+
+    bge     0f
+    bl      writeerr
+    b       10f //leave function
 0:
-	ldr	x0, [x29, f1]
-	add	x1, x29, bufin
-	mov	x2, #4096
-	mov	x8, #63
-	svc	#0
-	cmp	x0, #0
-	blt	8f
-	beq	9f
-	add	x0, x0, x29
-	add	x0, x0, bufin
-	ldr	w1, [x29, flg]
-	add	x3, x29, bufin
-	mov	x16, bufout
-	add	x4, x29, x16
-	ldr	w5, [x29, wrd]
-	mov	w6, ' '
+    str     x0, [x29, fd1]
+    adr 	x3, resstr
+    mov 	x20, x3
+    mov 	w10, ' '
+    mov 	w11, ' '
+    strb 	w12, [x3], #1 
 1:
-	cmp	x3, x0
-	bge	6f
-	ldrb	w2, [x3], #1
-	cbz	w2, 2f
-	cmp	w2, '\n'
-	beq	2f
-	cmp	w2, ' '
-	beq	3f
-	cmp	w2, '\t'
-	beq	3f
-	cbz	w1, 4f
-	tbz	w5, #0, 1b
-	b	5f
+        //read from file
+    ldr     x0, [x29, fd1]
+    add     x1, x29, buf
+    mov     x2, #4096
+    mov     x8, #63
+    svc     #0
+    cmp     x0, #0
+    beq     9f //write to stdout and close file
+    bgt     2f
+
+    str     x0, [sp, #-16]!
+    ldr     x0, [x29, fd1]
+    mov     x8, #57
+    svc     #0
+    ldr     x0, [sp], #16
+    bl      writeerr
+    mov     x0, #1
+    b       10f //leave function
 2:
-	mov	w1, #0
-	mov	w5, #0
-	b	5f
+    mov 	x4, x1 //beginning of the word
+    ldrb 	w8, [x1], #1
+    cmp 	w8, '\t'
+    beq 	2b  
+    cmp 	w8, '\n'
+    beq 	2b
+    cmp 	w8, ' '
+    beq 	2b
+
 3:
-	mov	w1, #0
-	b	1b
+    ldrb 	w9, [x1], #1
+    cmp 	w9, '\t'
+    beq 	4f
+    cmp 	w9, '\n'
+    beq 	4f
+    cmp 	w9, ' '
+    beq 	4f
+    cbz 	w9, 4f
+    b 		3b
+
 4:
-	add	w5, w5, #1
-	mov	w1, #1
-	tbz	w5, #0, 1b
-	cmp	w5, #1
-	beq	5f
-	strb	w6, [x4], #1
+    ldrb	 w9, [x1, #-2]!
+    mov 	x5, x1  //end of the word
+    cmp 	w10, ' ' //save the last letter of the first word
+    beq 	5f
+    cmp 	w9, w10
+    beq 	6f
+    add 	x1, x1, #1
+    b 		2b
 5:
-	strb	w2, [x4], #1
-	b	1b
+   //save the last letter of the first word
+    mov		w10, w9
 6:
-	str	w1, [x29, flg]
-	str	w5, [x29, wrd]
-	mov	x16, bufout
-	add	x1, x29, x16
-	sub	x2, x4, x1
-	cbz	x2, 0b
-	str	x2, [x29, tmp]
+	//put the word in the res string
+	cmp 	x4, x5
+	bgt 	7f
+	ldrb 	w6, [x4], #1
+	strb 	w6, [x3], #1
+	b 6b
+
 7:
-	ldr	x0, [x29, f2]
-	mov	x8, #64
-	svc	#0
-	cmp	x0, #0
-	blt	8f
-	ldr	x2, [x29, tmp]
-	cmp	x0, x2
-	beq	0b
-	mov	x16, bufout
-	add	x1, x29, x16
-	add	x1, x1, x0
-	sub	x2, x2, x0
-	str	x2, [x29, tmp]
-	b	7b
+	//put space after word
+	strb 	w11, [x3], #1
+	add 	x1, x1, #1
+	b 		2b
+	
 8:
-	str	x0, [x29, tmp]
-	ldr	x0, [x29, f2]
-	mov	x1, #0
-	mov	x8, #46
-	svc	#0
-	ldr	x0, [x29, tmp]
+		//close the string
+	mov 	w13, '\n'
+	strb 	w12, [x3, #-1]!
+	strb 	w13, [x3, #1]!
+	strb	wzr, [x3, #1]!
+	//write the text to stdout
+	mov     x2, x0
+    mov     x0, #1
+    mov 	x1, x20
+    mov     x8, #64
+    svc     #0
 9:
-	ldp	x29, x30, [sp]
-	mov	x16, #8240
-	add	sp, sp, x16
-	ret
+    //close the file
+    ldr     x0, [x29, fd1]
+    mov     x8, #57
+    svc     #0
+    mov     x0, #0
+10:
+    //close function
+    ldp     x29, x30, [sp]
+    mov     x16, #4128
+    add     sp, sp, x16
+    ret
 	.size	work, .-work
 	.type	writeerr, %function
 	.data

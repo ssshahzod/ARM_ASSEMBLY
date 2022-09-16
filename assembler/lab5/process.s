@@ -37,9 +37,9 @@ pixels1:
     cmp x7, x2
     bge end_pixels
 
-    ldrb w8, [x5], #1 //read R, G, B in w8, w9, w10
-    ldrb w9, [x5], #1
-    ldrb w10, [x5], #1
+    ldrb w8, [x0], #1 //read R, G, B in w8, w9, w10
+    ldrb w9, [x0], #1
+    ldrb w10, [x0], #1
     mov w11, w8 //store max here
     mov w12, w9 //store min here
     b max
