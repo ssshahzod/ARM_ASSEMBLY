@@ -178,33 +178,70 @@ work:
 
 
         .data
+usage:
+		.string "Program does not require parameters\n"
+		.equ 	usagelen, .-usage
 nofile:
         .string "No such file or directory\n"
         .equ    nofilelen, .-nofile
 permission:
         .string "Permission denied\n"
         .equ    permissionlen, .-permission
+isdir:
+		.string "Is a directory\n"
+		.equ	isdirlen, .-isdir
+toolong:
+		.string "File name too long\n"
+		.equ	toolonglen, .-toolong
+readerror:
+		.string "Error reading filename\n"
+		.equ	readerrorlen, .-readerror
 unknown:
         .string "Unknown error\n"
         .equ    unknownlen, .-unknown
         .text
         .align  2
 writeerr:
+		cbnz 	x0, 0f
+		adr		x1, usage
+		mov 	x2, usagelen
+		b 		6f
+
+0:
         cmp     x0, #-2
-        bne     0f
+        bne     1f
         adr     x1, nofile
         mov     x2, nofilelen
-        b       2f
-0:
+        b       6f
+1:
         cmp     x0, #-13
-        bne     1f
+        bne     2f
         adr     x1, permission
         mov     x2, permissionlen
-        b       2f
-1:
+        b       6f
+2:
+		cmp 	x0, #-21
+		bne		3f
+		adr 	x1, isdir
+		mov		x2, isdirlen
+		b 		6f		
+3:
+		cmp 	x0, #-36
+		bne		4f
+		adr 	x1, toolong
+		mov 	x2, toolonglen
+		b 		6f
+4:
+		cmp 	x0, #1
+		bne		5f
+		adr		x1, readerror
+		mov 	x2, readerrorlen
+		b 		6f
+
+5:
         adr     x1, unknown
         mov     x2, unknownlen
-2:
+6:
         mov     x0, #2
         mov     x8, #64
         svc     #0
