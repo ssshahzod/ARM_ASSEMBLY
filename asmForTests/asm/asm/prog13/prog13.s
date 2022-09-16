@@ -179,96 +179,124 @@ _start:
 	.text
 	.align	2
 work:
-	mov	x16, #8240
-	sub	sp, sp, x16
-	stp	x29, x30, [sp]
-	mov	x29, sp
-	str	x0, [x29, f1]
-	str	x1, [x29, f2]
-	str	xzr, [x29, flg]
+        //prepare new stackframe
+        mov     x16, #4128
+        sub     sp, sp, x16
+        
+        stp     x29, x30, [sp]
+        mov     x29, sp
+        str     x0, [x29, filename]
+        mov     x1, x0
+
+        //open file
+        mov     x0, #-100
+        mov     x2, #0
+        mov     x8, #56
+        svc     #0
+        cmp     x0, #0
+
+        bge     0f
+        bl      writeerr
+        b       10f //leave function
 0:
-	ldr	x0, [x29, f1]
-	add	x1, x29, bufin
-	mov	x2, #4096
-	mov	x8, #63
-	svc	#0
-	cmp	x0, #0
-	blt	8f
-	beq	9f
-	add	x0, x0, x29
-	add	x0, x0, bufin
-	ldr	w1, [x29, flg]
-	add	x3, x29, bufin
-	mov	x16, bufout
-	add	x4, x29, x16
-	ldr	w5, [x29, wrd]
-	mov	w6, ' '
+        str     x0, [x29, fd]
+        adr 	x3, resstr
+        mov 	x20, x3
+        mov 	w12, '\''
+        mov 	w10, ' '
+        mov 	w11, ' '
+        strb 	w12, [x3], #1 
 1:
-	cmp	x3, x0
-	bge	6f
-	ldrb	w2, [x3], #1
-	cbz	w2, 2f
-	cmp	w2, '\n'
-	beq	2f
-	cmp	w2, ' '
-	beq	3f
-	cmp	w2, '\t'
-	beq	3f
-	cbz	w1, 4f
-	tbz	w5, #0, 1b
-	b	5f
+        //read from file
+        ldr     x0, [x29, fd]
+        add     x1, x29, buf
+        mov     x2, #4096
+        mov     x8, #63
+        svc     #0
+        cmp     x0, #0
+        beq     9f //write to stdout and close file
+        bgt     2f
+
+        str     x0, [sp, #-16]!
+        ldr     x0, [x29, fd]
+        mov     x8, #57
+        svc     #0
+        ldr     x0, [sp], #16
+        bl      writeerr
+        mov     x0, #1
+        b       10f //leave function
 2:
-	mov	w1, #0
-	mov	w5, #0
-	b	5f
+        mov 	x4, x1 //beginning of the word
+        ldrb 	w8, [x1], #1
+        cbz 	w8, 8f 
+        cmp 	w8, '\t'
+        beq 	2b  
+        cmp 	w8, '\n'
+        beq 	2b
+        cmp 	w8, ' '
+        beq 	2b
+
 3:
-	mov	w1, #0
-	b	1b
+        ldrb 	w9, [x1], #1
+        cmp 	w9, '\t'
+    	beq 	4f
+        cmp 	w9, '\n'
+        beq 	4f
+        cmp 	w9, ' '
+        beq 	4f
+        cbz 	w9, 4f
+        b 		3b
+
 4:
-	add	w5, w5, #1
-	mov	w1, #1
-	tbz	w5, #0, 1b
-	cmp	w5, #1
-	beq	5f
-	strb	w6, [x4], #1
+        ldrb	 w9, [x1, #-2]!
+        mov 	x5, x1  //end of the word
+        cmp 	w10, ' ' //save the last letter of the first word
+        beq 	5f
+        cmp 	w9, w10
+        beq 	6f
+        add 	x1, x1, #1
+        b 		2b
 5:
-	strb	w2, [x4], #1
-	b	1b
+        //save the last letter of the first word
+        mov		w10, w9
 6:
-	str	w1, [x29, flg]
-	str	w5, [x29, wrd]
-	mov	x16, bufout
-	add	x1, x29, x16
-	sub	x2, x4, x1
-	cbz	x2, 0b
-	str	x2, [x29, tmp]
+	//put the word in the res string
+	cmp 	x4, x5
+	bgt 	7f
+	ldrb 	w6, [x4], #1
+	strb 	w6, [x3], #1
+	b 6b
+
 7:
-	ldr	x0, [x29, f2]
-	mov	x8, #64
-	svc	#0
-	cmp	x0, #0
-	blt	8f
-	ldr	x2, [x29, tmp]
-	cmp	x0, x2
-	beq	0b
-	mov	x16, bufout
-	add	x1, x29, x16
-	add	x1, x1, x0
-	sub	x2, x2, x0
-	str	x2, [x29, tmp]
-	b	7b
+	//put space after word
+	strb 	w11, [x3], #1
+	add 	x1, x1, #1
+	b 		2b
+	
 8:
-	str	x0, [x29, tmp]
-	ldr	x0, [x29, f2]
-	mov	x1, #0
-	mov	x8, #46
-	svc	#0
-	ldr	x0, [x29, tmp]
+		//close the string
+	mov 	w13, '\n'
+	strb 	w12, [x3, #-1]!
+	strb 	w13, [x3, #1]!
+	strb	wzr, [x3, #1]!
+	//write the text to stdout
+	mov     x2, x0
+        mov     x0, #1
+        mov 	x1, x20
+        mov     x8, #64
+        svc     #0
 9:
-	ldp	x29, x30, [sp]
-	mov	x16, #8240
-	add	sp, sp, x16
-	ret
+        //close the file
+        ldr     x0, [x29, fd]
+        mov     x8, #57
+        svc     #0
+        mov     x0, #0
+10:
+        //close function
+        ldp     x29, x30, [sp]
+        mov     x16, #4128
+        add     sp, sp, x16
+        ret
 	.size	work, .-work
 	.type	writeerr, %function
 	.data
