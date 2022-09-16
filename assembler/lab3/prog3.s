@@ -1,48 +1,72 @@
         .arch armv8-a
         
         .data
-errmes1:
-        .string "Usage: "
-        .equ    errlen1, .-errmes1
-errmes2:
+mes1:
+        .string "Input filename for read\n"
+        .equ    len1, .-mes1
+mes2:
         .string " filename\n"
-        .equ    errlen2, .-errmes2
+        .equ    len2, .-mes2
 resstr:
         .skip 4096
-
+name:
+		.skip 1024
         .text
         .align  2
         .global _start
         .type   _start, %function
 _start:
         ldr     x0, [sp]
-        cmp     x0, #2
-        beq     2f
-        mov     x0, #2
-        adr     x1, errmes1
-        mov     x2, errlen1
-        mov     x8, #64
-        svc     #0
-        mov     x0, #2
-        ldr     x1, [sp, #8]
-        mov     x2, #0
+        cmp     x0, #1
+        beq     2f //continue
+        mov     x0, #0
+        bl 		writeerr
+        mov 	x0, #1
+        b 		3f //branch to exit
+        
+       // adr     x1, mes1
+       // mov     x2, len1
+       // mov     x8, #64
+       // svc     #0
+       // mov     x0, #2
+       // ldr     x1, [sp, #8]
+       // mov     x2, #0
 0:
         ldrb    w3, [x1, x2]
         cbz     w3, 1f
         add     x2, x2, #1
-        b       0b
+        b       0b 	//cycle
 1:
         mov     x8, #64
         svc     #0
         mov     x0, #2
-        adr     x1, errmes2
-        mov     x2, errlen2
+        adr     x1, mes2
+        mov     x2, len2
         mov     x8, #64
         svc     #0
         mov     x0, #1
-        b       3f
+        b       3f //branch to exit
 2:
-        ldr     x0, [sp, #16]
+        //ldr     x0, [sp, #16]
+        mov		x0, #1
+        adr		x1, mes1
+        mov		x2, len1
+        mov		x8, #64
+        svc		#0
+
+        mov		x0, #0
+        adr		x1, name
+        mov		x2, #1024
+        mov		x8, #63
+        svc 	#0
+
+		cmp 	x0, #1
+		ble		3f
+		cmp		x0, #1024
+		sub		x2, x0, #1
+		adr		x1, name
+		strb	wzr, [x1, x2]
+		mov		x0, x1
         bl      work
 3:
         mov     x8, #93
