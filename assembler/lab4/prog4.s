@@ -13,63 +13,12 @@ mode:
 filestr:
 	.string "%d:  %.17g\n"
 testmes:
-	.string "Filename entered: %s\n"
+	.string "Step: %d\n"
 usagemes:
 	.string "Usage: ./bin filename\n"
 	.text
 	.align	2
-	.global	cos
-	.type	cos, %function
-cos:
-	//ldr 	x0, [sp, filestruct]
-	adr 	x1, filestr
-	mov		x23, #0
-	mov 	x2, #0
-	fmov	d1, d0
-	fmov 	d0, #1.0
-	fmov 	d5, d0
-	fadd	d10, d1, d0
-	fadd	d3, d1, d0
-0:
-	add		x2, x2, #1
-	fmov	d4, d0 //previous sum
-	fmul	d1, d1, d1 //store multiplication
-	fmov	d6, d1 //save abs value
-	
-	fdiv	d1, d1, d3  //divide to factorial
-	fneg 	d1, d1
-	fadd	d0, d0, d1 
-	
-	fadd	d10, d10, d5
-	fmul	d3,	d3, d10
-	fadd	d10, d10, d5
-	fmul	d3, d3, d10
-	b 2f
 
-1:
-	adr x0, mes12
-	bl printf
-	cmp 	x22, x23
-	bgt		0b
-	b 		5f
-
-
-2:
-	fsub	d8, d4, d0
-	//ldr		x0, [sp, filestruct]
-	fcmp	d8, d7
-	//d0 - current sum
-	bgt		3f
-3:
-	mov 	x22, #1
-	b 1b
-4:
-	mov		x22, #0
-	b 1b
-5:
-	fmov	d0, d4
-	ret
-	.size	cos, .-cos
 	.global	main
 	.type	main, %function
 	.equ	x, 16
@@ -113,13 +62,46 @@ main:
 	adr x0, mes2 //read precision
 	add x1, x29, y
 	bl scanf
-	ldr d7, [x29, y] //prepare parameters for cos function
-	ldr d0, [x29, x]
+	ldr d9, [x29, y] //prepare parameters for cos 
+	ldr d8, [x29, x]
 	
-	bl	cos
+cos:
+	//d8 - x
+	//d9 - 
+	mov 	x22, #0
+	fmov	d11, d8
+	fmov 	d8, #1.0
+	fmov 	d15, d8
+	fadd	d10, d11, d8
+	fadd	d13, d11, d8
+0:
+	add		x22, x22, #1
+	fmov	d12, d8 //previous sum
+	fmul	d11, d11, d11 //store multiplication
+	//fmov	d6, d11 //save abs value
+	
+	fdiv	d11, d11, d13  //divide to factorial
+	fneg 	d11, d11
+	fadd	d8, d8, d11 
+	
+	fadd	d10, d10, d15
+	fmul	d13, d13, d10
+	fadd	d10, d10, d15
+	fmul	d13, d13, d10
+
+2:
+	ldr 	x0, [sp, filestruct]
+	adr x1, filestr
+	mov x2, x22
+	fmov d0, d8
+	bl fprintf
+	fsub	d0, d12, d8
+	fcmp	d0, d9
+	bgt		0b
+	fmov	d0, d12
+3:
 	ldr x0, [sp, filestruct]
 	bl fclose
-	
 	str	d0, [x29, p]
 	adr	x0, mes3
 	ldr	d0, [x29, x]
