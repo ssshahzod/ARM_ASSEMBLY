@@ -16,12 +16,12 @@ void process_asm(uint8_t *image, uint8_t *copy, uint32_t width, uint32_t height)
 
 int main(int argc, char **argv) {
     if(argc < 3) {
-        printf("provide input and output files\n");
+        printf("Provide input and output files.\n");
         return 0;
     }
 
     if(access(argv[1], R_OK) != 0) {
-        printf("error opening input file %s\n", argv[1]);
+        printf("Error opening input file: %s\n", argv[1]);
         return 0;
     }
 
@@ -38,7 +38,7 @@ int work(char *input, char *output) {
         return 1;
     }
 
-    size_t size = w * h * 3;
+    //size_t size = w * h * 3;
     uint8_t *extended = extend(data, w, h);
     uint8_t *copy = malloc((w + 2) * (h + 2) * 3);
 
@@ -51,8 +51,7 @@ int work(char *input, char *output) {
     #endif
 
     clock_t end = clock();
-    // printf("processing time: %lf\n", time_spent);
-    printf("%lf \n", (double)(end - begin) / CLOCKS_PER_SEC);
+    printf("Processing time: %lf \n", (double)(end - begin) / CLOCKS_PER_SEC);
     fflush(stdout);
 
     if (stbi_write_png(output, w, h, 3, copy + (w+2)*3+3, (w+2)*3) == 0) {
@@ -69,7 +68,6 @@ int work(char *input, char *output) {
 
 uint8_t* extend(uint8_t *image, uint32_t w, uint32_t h) {
     uint8_t *extended = malloc((w + 2) * (h + 2) * 3);
-    int line1 = w * 3;
     int line2 = (w + 2) * 3;
     register int i1 = 0;
     register int i2 = line2 + 1 * 3;
@@ -107,7 +105,7 @@ static inline int grey(int max, int min){
     return (max + min) / 2;
 }
 
-static inline int getMin(uint8_t *image, int index, int line){
+static inline int getMin(uint8_t *image, int index){
     int tmp = image[index];
     if(tmp > image[index + 1]){
         tmp = image[index + 1];
@@ -119,7 +117,7 @@ static inline int getMin(uint8_t *image, int index, int line){
     return tmp;
 }
 
-static inline int getMax(uint8_t *image, int index, int line){
+static inline int getMax(uint8_t *image, int index){
     int tmp = image[index];
     if(tmp < image[index + 1]){
         tmp = image[index + 1];
@@ -139,8 +137,8 @@ void process(uint8_t *image, uint8_t *copy, uint32_t w, uint32_t h) {
 
     for (register int y = 1; y < h; ++y){
         for (register int x = 1; x < w; ++x, i += 3) {
-            max = getMax(image, i, line);
-            min = getMin(image, i, line);
+            max = getMax(image, i);
+            min = getMin(image, i);
             //i - process red
             //i + 1 - process green
             //i + 2 - process blue
