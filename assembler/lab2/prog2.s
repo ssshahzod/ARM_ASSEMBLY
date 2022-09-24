@@ -9,10 +9,11 @@ num_rows:
 	.word 4
 
 matrix: //;matrix
-	.word  10, 12, 25, 9, 14
-	.word  0, 1, 92, 11, 2
-	.word  34, 44, 67, 88, 5
-	.word  3, 23, 74, 7, 4
+	.word  4, 6, 1, 8, 2
+	.word  1, 2, 3, 4, 5
+	.word  5, 7, 8, 4, 2
+	.word  0, -7, 3, -1, -1
+	
 
 mins:
 	.skip 40

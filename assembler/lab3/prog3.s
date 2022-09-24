@@ -22,6 +22,7 @@ _start:
         mov     x0, #0
         bl 		writeerr
         mov 	x0, #1
+        mov 	x15, #1
         b 		3f //branch to exit
         
        // adr     x1, mes1
@@ -105,16 +106,16 @@ work:
         mov 	w12, '\''
         mov 	w10, ' '
         mov 	w11, ' '
-        strb 	w12, [x3], #1 
+//        strb 	w12, [x3], #1 
 1:
         //read from file
         ldr     x0, [x29, fd]
         add     x1, x29, buf
-        mov     x2, #4096
+        mov     x2, #10
         mov     x8, #63
         svc     #0
         cmp     x0, #0
-        beq     9f //write to stdout and close file
+        beq     8f //write to stdout and close file
         bgt     2f
 
         str     x0, [sp, #-16]!
@@ -128,11 +129,12 @@ work:
 2:
         mov 	x4, x1 //beginning of the word
         ldrb 	w8, [x1], #1
-        cbz 	w8, 8f 
+        //cbz 	w8, 8f 
+        cbz		w8, 1b
         cmp 	w8, '\t'
         beq 	2b  
-        cmp 	w8, '\n'
-        beq 	2b
+//        cmp 	w8, '\n'
+//        beq 	2b
         cmp 	w8, ' '
         beq 	2b
 
@@ -153,7 +155,7 @@ work:
         cmp 	w10, ' ' //save the last letter of the first word
         beq 	5f
         cmp 	w9, w10
-        beq 	6f
+        bne 	6f
         add 	x1, x1, #1
         b 		2b
 5:
@@ -163,6 +165,7 @@ work:
 		//put the word in the res string
 		cmp 	x4, x5
 		bgt 	7f
+		add 	x15, x15, #1 ///////////////
 		ldrb 	w6, [x4], #1
 		strb 	w6, [x3], #1
 		b 6b
@@ -176,11 +179,13 @@ work:
 8:
 		//close the string
 		mov 	w13, '\n'
-		strb 	w12, [x3, #-1]!
+//		strb 	w12, [x3, #-1]!
 		strb 	w13, [x3, #1]!
 		strb	wzr, [x3, #1]!
 		//write the text to stdout
-		mov     x2, x0
+		//mov     x2, x0
+		add 	x15, x15, #1 ////////////
+		mov 	x2, x15
         mov     x0, #1
         mov 	x1, x20
         mov     x8, #64
