@@ -29,7 +29,7 @@ usagemes:
 	.equ 	filename, 56
 	.equ 	filestruct, 64
 main:
-	stp	x29, x30, [sp, #-32]!
+ 	stp	x29, x30, [sp, #-32]!
 	mov	x29, sp
 	cmp w0, #2
 	bne 4f //exit if no parameters were passed
@@ -64,7 +64,6 @@ main:
 	bl scanf
 	ldr d9, [x29, y] //prepare parameters for cos 
 	ldr d8, [x29, x]
-	
 cos:
 	//d8 - x
 	//d9 - 
@@ -107,10 +106,23 @@ cos:
 	ldr	d0, [x29, x]
 	ldr	d1, [x29, p]
 	bl	printf
-	b 5f
+	b ccos
+    b 5f
 4:
 	adr x0, usagemes
 	bl printf
+ccos:
+	ldr d1, [x29, x]
+	ldr d0, [x29, x]
+
+	bl cos
+	
+	fmov d2, d0
+	fmov d0, d1
+	fmov d1, d2
+	adr x0, mes3
+	bl printf
+	b 5f
 5:
 	ldp	x29, x30, [sp], #32
 	mov	w0, #0

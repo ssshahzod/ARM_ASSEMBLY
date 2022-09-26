@@ -1,32 +1,29 @@
-#CROSS_COMPILE ?= aarch64-linux-gnu-
+CROSS_COMPILE ?= aarch64-linux-gnu-
 
-#PREFIX = /usr/local/arm64
-#OBJPATH2 = /usr/lib64
+PREFIX = /opt/gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu/aarch64-linux-gnu
 
-#AS = $(CROSS_COMPILE)as
-#LD = $(CROSS_COMPILE)ld
+AS = $(CROSS_COMPILE)as
+LD = $(CROSS_COMPILE)ld
 
-#ASFLAGS = -g
-#LDFLAGS = -g -static
-#LIBPATH = -L $(PREFIX)/lib/gcc/aarch64-linux-gnu/7.5.0 -L $(PREFIX)/aarch64-linux-gnu/libc/usr/lib
-#OBJPATH = $(PREFIX)/aarch64-linux-gnu/libc/usr/lib
-#LIBS = -lgcc -lgcc_eh -lc -lm
-#PREOBJ = $(OBJPATH)/crt1.o $(OBJPATH)/crti.o
-#POSTOBJ = $(OBJPATH)/crtn.o
+ASFLAGS = -g
+LDFLAGS = -g -static
+LIBPATH = -L $(PREFIX)/libc/usr/lib -L $(PREFIX)/../lib/gcc/aarch64-linux-gnu/7.5.0
+OBJPATH = $(PREFIX)/libc/usr/lib
+LIBS = -lgcc -lgcc_eh -lc -lm
+PREOBJ = $(OBJPATH)/crt1.o $(OBJPATH)/crti.o
+POSTOBJ = $(OBJPATH)/crtn.o
 
-#SRCS = prog14.s
-#OBJS = $(SRCS:.s=.o)
-CC  := aarch64-linux-gnu-gcc
+SRCS = prog4.s
+OBJS = $(SRCS:.s=.o)
 EXE := prog4
-build: *.s
-	$(CC) -g -static -o $(EXE) $^ -lm
-#all: $(SRCS) $(EXE)
 
-#clean:
-#	rm -rf $(EXE) $(OBJS)
+all: $(SRCS) $(EXE)
 
-#$(EXE): $(OBJS)
-#	$(LD) $(LDFLAGS) $(LIBPATH) $(PREOBJ) $(OBJS) $(POSTOBJ) -\( $(LIBS) -\) -o $@
+clean:
+	rm -rf $(EXE) $(OBJS)
 
-#.s.o:
-#	$(AS) $(ASFLAGS) $< -o $@
+$(EXE): $(OBJS)
+	$(LD) $(LDFLAGS) $(LIBPATH) $(PREOBJ) $(OBJS) $(POSTOBJ) -\( $(LIBS) -\) -o $@
+
+.s.o:
+	$(AS) $(ASFLAGS) $< -o $@
