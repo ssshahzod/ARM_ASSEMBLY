@@ -32,7 +32,7 @@ main:
 	stp	x29, x30, [sp, #-32]!
 	mov	x29, sp
 	cmp w0, #2
-	bne 2f //exit if no parameters were passed
+	bne 4f //exit if no parameters were passed
 
 	ldr x0, [x1]
 	str x0, [sp, progname]
@@ -45,7 +45,7 @@ main:
 	cbnz x0, 1f 
 	ldr x0, [sp, #8]
 	bl perror
-	b 3f
+	b 5f
 	
 1:
 	str x0, [sp, filestruct]
@@ -107,11 +107,11 @@ cos:
 	ldr	d0, [x29, x]
 	ldr	d1, [x29, p]
 	bl	printf
-	b 3f
-2:
+	b 5f
+4:
 	adr x0, usagemes
 	bl printf
-3:
+5:
 	ldp	x29, x30, [sp], #32
 	mov	w0, #0
 	ret
