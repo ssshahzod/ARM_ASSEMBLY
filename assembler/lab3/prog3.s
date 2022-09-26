@@ -11,6 +11,8 @@ resstr:
         .skip 4096
 name:
 		.skip 1024
+buffer:
+		.skip 10
         .text
         .align  2
         .global _start
@@ -24,14 +26,6 @@ _start:
         mov 	x0, #1
         mov 	x15, #1
         b 		3f //branch to exit
-        
-       // adr     x1, mes1
-       // mov     x2, len1
-       // mov     x8, #64
-       // svc     #0
-       // mov     x0, #2
-       // ldr     x1, [sp, #8]
-       // mov     x2, #0
 0:
         ldrb    w3, [x1, x2]
         cbz     w3, 1f
@@ -98,7 +92,7 @@ work:
 
         bge     0f
         bl      writeerr
-        b       10f //leave function
+        b       11f //leave function
 0:
         str     x0, [x29, fd]
         adr 	x3, resstr
@@ -106,16 +100,16 @@ work:
         mov 	w12, '\''
         mov 	w10, ' '
         mov 	w11, ' '
-//        strb 	w12, [x3], #1 
+//        strb 	w12, [x3], #1 //;write ' to beginning of the string
 1:
         //read from file
         ldr     x0, [x29, fd]
         add     x1, x29, buf
-        mov     x2, #10
+        mov     x2, #10 //reading buffer size
         mov     x8, #63
         svc     #0
         cmp     x0, #0
-        beq     8f //write to stdout and close file
+        beq     9f //write to stdout and close file
         bgt     2f
 
         str     x0, [sp, #-16]!
@@ -125,11 +119,11 @@ work:
         ldr     x0, [sp], #16
         bl      writeerr
         mov     x0, #1
-        b       10f //leave function
+        b       11f //leave function
 2:
         mov 	x4, x1 //beginning of the word
         ldrb 	w8, [x1], #1
-        //cbz 	w8, 8f 
+        //cbz 	w8, 9f 
         cbz		w8, 1b
         cmp 	w8, '\t'
         beq 	2b  
@@ -146,37 +140,41 @@ work:
         beq 	4f
         cmp 	w9, ' '
         beq 	4f
-        cbz 	w9, 4f
+        cbz 	w9, 5f
         b 		3b
 
 4:
-        ldrb	 w9, [x1, #-2]!
+        ldrb	 w9, [x1, #-2]! //work with the last letter of the word
         mov 	x5, x1  //end of the word
         cmp 	w10, ' ' //save the last letter of the first word
-        beq 	5f
+        beq 	6f
         cmp 	w9, w10
-        bne 	6f
+        bne 	7f
         add 	x1, x1, #1
         b 		2b
-5:
+5:	
+		
+		
+		
+6:
         //save the last letter of the first word
         mov		w10, w9
-6:
+7:
 		//put the word in the res string
 		cmp 	x4, x5
-		bgt 	7f
-		add 	x15, x15, #1 ///////////////
+		bgt 	8f
+		add 	x15, x15, #1 ///////////////count num of the symbols in the res string
 		ldrb 	w6, [x4], #1
 		strb 	w6, [x3], #1
-		b 6b
+		b 7b
 
-7:
+8:
 		//put space after word
 		strb 	w11, [x3], #1
 		add 	x1, x1, #1
 		b 		2b
 	
-8:
+9:
 		//close the string
 		mov 	w13, '\n'
 //		strb 	w12, [x3, #-1]!
@@ -190,13 +188,13 @@ work:
         mov 	x1, x20
         mov     x8, #64
         svc     #0
-9:
+10:
         //close the file
         ldr     x0, [x29, fd]
         mov     x8, #57
         svc     #0
         mov     x0, #0
-10:
+11:
         //close function
         ldp     x29, x30, [sp]
         mov     x16, #4128
