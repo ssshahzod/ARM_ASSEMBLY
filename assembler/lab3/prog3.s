@@ -97,6 +97,7 @@ work:
         str     x0, [x29, fd]
         adr 	x3, resstr
         mov 	x20, x3
+        mov 	x21, #10 //buf size
         mov 	w12, '\''
         mov 	w10, ' '
         mov 	w11, ' '
@@ -108,6 +109,10 @@ work:
         mov     x2, #10 //reading buffer size
         mov     x8, #63
         svc     #0
+
+		mov 	x17, #0
+		adr 	x14, buffer
+        
         cmp     x0, #0
         beq     9f //write to stdout and close file
         bgt     2f
@@ -120,11 +125,14 @@ work:
         bl      writeerr
         mov     x0, #1
         b       11f //leave function
-2:
-        mov 	x4, x1 //beginning of the word
+2:	
+		//beginning of the word
+        mov 	x4, x1
         ldrb 	w8, [x1], #1
+        add 	x17, x17, #1 //num of the letters written in the buff
         //cbz 	w8, 9f 
-        cbz		w8, 1b
+        cbz		w8, 5f
+        strb	w8, [x14], #1
         cmp 	w8, '\t'
         beq 	2b  
 //        cmp 	w8, '\n'
@@ -141,6 +149,7 @@ work:
         cmp 	w9, ' '
         beq 	4f
         cbz 	w9, 5f
+        strb	w9, [x14], #1
         b 		3b
 
 4:
@@ -153,8 +162,46 @@ work:
         add 	x1, x1, #1
         b 		2b
 5:	
-		
-		
+		//read file after previous part of the word saved in the buffer
+		ldr     x0, [x29, fd]
+        add     x1, x29, buf
+        mov     x2, #10 //reading buffer size
+        mov     x8, #63
+        svc     #0
+        cmp     x0, #0
+        beq 	getbuf
+       // cmp 	w10, ' '
+       // beq 	clearbuf
+  		mov 	x23, x1
+        b 31f
+
+getbuf:
+		mov 	x1, x14
+		b 		4b
+        
+clearbuf:
+		adr 	x14, buffer
+		mov 	x17, #0
+		b 		2b
+
+31:
+		ldrb 	w9, [x1], #1
+        //strb	w9, [x14], #1
+        cmp 	w9, '\t'
+    	beq 	comp
+        cmp 	w9, '\n'
+        beq 	comp
+        cmp 	w9, ' '
+        beq 	comp
+        b 		31b
+
+comp:
+		ldrb	 w9, [x1, #-2]! //work with the last letter of the word
+        mov 	x5, x1  //end of the word
+        cmp 	w9, w10
+        bne 	write2
+        add 	x1, x1, #1	
+        b 		2b
 		
 6:
         //save the last letter of the first word
@@ -167,6 +214,31 @@ work:
 		ldrb 	w6, [x4], #1
 		strb 	w6, [x3], #1
 		b 7b
+write2:
+		//put the word in the res string from 2 sources
+		//x23 - beginning of the second part, x1 - end of the second part
+		//x21 - size of buffer
+		adr 	x14, buffer
+		sub 	x16, x17, #1
+		add 	x14, x14, x16
+		adr		x16, buffer
+		add	 	x16, x16, x21
+		//x14 - beginning of the first part, x17 - number,  where the beginning of the word stored in the buffer
+write22:
+		cmp 	x14, x16
+		bgt		write23
+		ldrb	w6, [x14], #1
+		strb 	w6, [x3], #1
+		add		x15, x15, #1
+		b 		write22	
+
+write23:	//write second part to the res string
+		cmp		x23, x1
+		bgt		8f
+		ldrb 	w6, [x23], #1
+		strb 	w6, [x3], #1
+		add 	x15, x15, #1
+		b 	write23	
 
 8:
 		//put space after word
