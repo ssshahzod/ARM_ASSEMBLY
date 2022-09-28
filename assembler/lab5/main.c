@@ -11,7 +11,7 @@
 
 int work(char *input, char *output);
 uint8_t* extend(uint8_t *image, uint32_t width, uint32_t height);
-void process(uint8_t *image, uint8_t *copy, uint32_t width, uint32_t height);
+void process(uint8_t *image, uint8_t *copy, int width, int height, int original_channels, int desired_channels);
 void process_asm(uint8_t *image, uint8_t *copy, uint32_t width, uint32_t height);
 
 int main(int argc, char **argv) {
@@ -30,121 +30,81 @@ int main(int argc, char **argv) {
 }
 
 int work(char *input, char *output) {
-    int w, h;
-    unsigned char *data = stbi_load(input, &w, &h, NULL, 3);
-
+    int w, h, original_no_channels;
+    int desired_no_channels;
+    unsigned char *data = stbi_load(input, &w, &h, &original_no_channels, desired_no_channels);
     if (data == NULL) {
         puts(stbi_failure_reason());
         return 1;
     }
+	
+    size_t size = w * h * original_no_channels;
+    int gray_channels = 4 ? 2 : 1;
+    size_t gray_image_size = w * h * gray_channels; 
+    
+	uint8_t *copy = malloc(gray_image_size);
 
-    //size_t size = w * h * 3;
-    uint8_t *extended = extend(data, w, h);
-    uint8_t *copy = malloc((w + 2) * (h + 2) * 3);
+
+    //uint8_t *copy = malloc((w + 2) * (h + 2) * 3);
 
     clock_t begin = clock();
 
     #ifdef ASM
-        process_asm(extended, copy, w + 2, h + 2);
+        process_asm(extended, copy, w, h);
     #else
-        process(extended, copy, w + 2, h + 2);
+        process(data, copy, w, h, original_no_channels, desired_no_channels);
     #endif
 
     clock_t end = clock();
     printf("Processing time: %lf \n", (double)(end - begin) / CLOCKS_PER_SEC);
     fflush(stdout);
 
-    if (stbi_write_png(output, w, h, 3, copy + (w+2)*3+3, (w+2)*3) == 0) {
+    if (stbi_write_png(output, w, h, gray_channels, copy, 0) == 0){
     // if (stbi_write_png(output, w + 2, h + 2, 3, copy, 0) == 0) {
         puts("Some png writing error\n");
         return 1;
     }
 
     free(copy);
-    free(extended);
     stbi_image_free(data);
     return 0;
 }
 
-uint8_t* extend(uint8_t *image, uint32_t w, uint32_t h) {
-    uint8_t *extended = malloc((w + 2) * (h + 2) * 3);
-    int line2 = (w + 2) * 3;
-    register int i1 = 0;
-    register int i2 = line2 + 1 * 3;
-    
-    for (register int y = 0; y < h; ++y) {
-        for (register int x = 0; x < w; ++x) {
-            extended[i2] = image[i1];
-            extended[i2+1] = image[i1+1];
-            extended[i2+2] = image[i1+2];
-            i1 += 3;
-            i2 += 3;
-        }
-        i2 += 2 * 3;
-    }
-
-    i1 = line2;
-    for (register int y = 1; y <= h; ++y) {
-        extended[i1] = extended[i1+3];
-        extended[i1+1] = extended[i1+4];
-        extended[i1+2] = extended[i1+5];
-        i1 += line2;
-        extended[i1-3] = extended[i1-6];
-        extended[i1-2] = extended[i1-5];
-        extended[i1-1] = extended[i1-4];
-    }
-    
-    memcpy(extended, extended + line2, line2);
-    memcpy(extended + line2 * (h + 1), extended + line2 * h, line2);
-
-    return extended;
-}
-
 //process one pixel
-static inline int grey(int max, int min){
-    return (max + min) / 2;
+static inline int get_max(int num1, int num2, int num3){
+	int tmp = num1;
+	if(tmp < num2){
+		tmp = num2;
+	}
+	if(tmp < num3){
+		tmp = num3;
+	}
+
+	return tmp;
 }
 
-static inline int getMin(uint8_t *image, int index){
-    int tmp = image[index];
-    if(tmp > image[index + 1]){
-        tmp = image[index + 1];
-    }
+static inline int get_min(int num1, int num2, int num3){
+	int tmp = num1;
+	if(tmp > num2){
+		tmp = num2;
+	}
+	if(tmp > num3){
+		tmp = num3;
+	}
 
-    if(tmp > image[index + 2]){
-        tmp = image[index + 2];
-    }
-    return tmp;
+	return tmp;
 }
 
-static inline int getMax(uint8_t *image, int index){
-    int tmp = image[index];
-    if(tmp < image[index + 1]){
-        tmp = image[index + 1];
-    }
-
-    if(tmp < image[index + 2]){
-        tmp = image[index + 2];
-    }
-    return tmp;
-}
-
-
-void process(uint8_t *image, uint8_t *copy, uint32_t w, uint32_t h) {
-    int line = w * 3;
-    register int i = line + 3;
+void process(uint8_t *image, uint8_t *copy, int w, int h, int channels, int gray_channels) {
+    size_t size = w * h * channels;
     int max, min;
 
-    for (register int y = 1; y < h; ++y){
-        for (register int x = 1; x < w; ++x, i += 3) {
-            max = getMax(image, i);
-            min = getMin(image, i);
-            //i - process red
-            //i + 1 - process green
-            //i + 2 - process blue
-            copy[i] = grey(max, min);
-            copy[i + 1] = grey(max, min);
-            copy[i + 2] = grey(max, min);
-        }
-    }
+   	for(uint8_t *p = image, *pg = copy; p != image + size; p += channels, pg += gray_channels){
+   		max = get_max(*p, *p + 1, *p + 2);
+   		min = get_min(*p, *p + 1, *p + 2);
+   		*pg = (uint8_t) (max + min) / 2;
+   		if(channels == 4){
+   			*(pg + 1) = *(p + 3);
+   		}
+   	}
 }
