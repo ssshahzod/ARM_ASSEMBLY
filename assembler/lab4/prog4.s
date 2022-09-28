@@ -64,7 +64,7 @@ main:
 	bl scanf
 	ldr d9, [x29, y] //prepare parameters for cos 
 	ldr d8, [x29, x]
-cos:
+mycos:
 	//d8 - x
 	//d9 - 
 	mov 	x22, #0
@@ -112,11 +112,11 @@ cos:
 	adr x0, usagemes
 	bl printf
 ccos:
-	ldr d1, [x29, x]
 	ldr d0, [x29, x]
-
+	
 	bl cos
 	
+	ldr d1, [x29, x]
 	fmov d2, d0
 	fmov d0, d1
 	fmov d1, d2
