@@ -13,6 +13,8 @@ name:
 		.skip 1024
 buffer:
 		.skip 10
+reading_buf_size:
+		.word 10
         .text
         .align  2
         .global _start
@@ -97,7 +99,8 @@ work:
         str     x0, [x29, fd]
         adr 	x3, resstr
         mov 	x20, x3
-        mov 	x21, #10 //buf size
+        adr		x0, reading_buf_size
+        ldr 	x21, [x0]
         mov 	w12, '\''
         mov 	w10, ' '
         mov 	w11, ' '
@@ -129,19 +132,21 @@ work:
 		//beginning of the word
         mov 	x4, x1
         ldrb 	w8, [x1], #1
-        add 	x17, x17, #1 //num of the letters written in the buff
+        add		x17, x17, #1
         //cbz 	w8, 9f 
         cbz		w8, 5f
-        strb	w8, [x14], #1
         cmp 	w8, '\t'
         beq 	2b  
 //        cmp 	w8, '\n'
 //        beq 	2b
         cmp 	w8, ' '
         beq 	2b
+        strb	w8, [x14], #1
+        cmp		x17, x0
+        beq		5f		
 
 3:
-        ldrb 	w9, [x1], #1
+        ldrb 	w9, [x1]
         cmp 	w9, '\t'
     	beq 	4f
         cmp 	w9, '\n'
@@ -149,17 +154,25 @@ work:
         cmp 	w9, ' '
         beq 	4f
         cbz 	w9, 5f
-        strb	w9, [x14], #1
+        strb	w9, [x14], #1 //after this cycle buffer contains probably full word
+        add		x1, x1, #1
+        add		x17, x17, #1
+        cmp		x17, x0
+        beq 	4f
         b 		3b
 
-4:
-        ldrb	 w9, [x1, #-2]! //work with the last letter of the word
-        mov 	x5, x1  //end of the word
+4:  
+        //work with word from buffer
+		//strb	w10, [x14]
+		sub 	x14, x14, #1 //end of the word
+		adr 	x16, buffer
+        ldrb 	w9, [x14] //work with the last letter of the word
         cmp 	w10, ' ' //save the last letter of the first word
         beq 	6f
         cmp 	w9, w10
         bne 	7f
         add 	x1, x1, #1
+        adr		x14, buffer
         b 		2b
 5:	
 		//read file after previous part of the word saved in the buffer
@@ -169,82 +182,29 @@ work:
         mov     x8, #63
         svc     #0
         cmp     x0, #0
-        beq 	getbuf
+        beq 	9f //work with word from buffer //finish
        // cmp 	w10, ' '
        // beq 	clearbuf
-  		mov 	x23, x1
-        b 31f
-
-getbuf:
-		mov 	x1, x14
-		b 		4b
-        
-clearbuf:
-		adr 	x14, buffer
-		mov 	x17, #0
-		b 		2b
-
-31:
-		ldrb 	w9, [x1], #1
-        //strb	w9, [x14], #1
-        cmp 	w9, '\t'
-    	beq 	comp
-        cmp 	w9, '\n'
-        beq 	comp
-        cmp 	w9, ' '
-        beq 	comp
-        b 		31b
-
-comp:
-		ldrb	 w9, [x1, #-2]! //work with the last letter of the word
-        mov 	x5, x1  //end of the word
-        cmp 	w9, w10
-        bne 	write2
-        add 	x1, x1, #1	
-        b 		2b
-		
+        b 3b
 6:
         //save the last letter of the first word
         mov		w10, w9
 7:
 		//put the word in the res string
-		cmp 	x4, x5
+		cmp 	x16, x14
 		bgt 	8f
-		add 	x15, x15, #1 ///////////////count num of the symbols in the res string
-		ldrb 	w6, [x4], #1
+		add 	x15, x15, #1 //count num of the symbols in the res string
+		ldrb 	w6, [x16], #1
 		strb 	w6, [x3], #1
 		b 7b
-write2:
-		//put the word in the res string from 2 sources
-		//x23 - beginning of the second part, x1 - end of the second part
-		//x21 - size of buffer
-		adr 	x14, buffer
-		sub 	x16, x17, #1
-		add 	x14, x14, x16
-		adr		x16, buffer
-		add	 	x16, x16, x21
-		//x14 - beginning of the first part, x17 - number,  where the beginning of the word stored in the buffer
-write22:
-		cmp 	x14, x16
-		bgt		write23
-		ldrb	w6, [x14], #1
-		strb 	w6, [x3], #1
-		add		x15, x15, #1
-		b 		write22	
-
-write23:	//write second part to the res string
-		cmp		x23, x1
-		bgt		8f
-		ldrb 	w6, [x23], #1
-		strb 	w6, [x3], #1
-		add 	x15, x15, #1
-		b 	write23	
-
+		
 8:
 		//put space after word
 		strb 	w11, [x3], #1
-		add 	x1, x1, #1
-		b 		2b
+		add 	x15, x15, #1
+		adr		x14, buffer
+		cmp		x0, #0
+		bgt 	2b
 	
 9:
 		//close the string
@@ -254,7 +214,7 @@ write23:	//write second part to the res string
 		strb	wzr, [x3, #1]!
 		//write the text to stdout
 		//mov     x2, x0
-		add 	x15, x15, #1 ////////////
+		add 	x15, x15, #1 //count how much symbols write to the output
 		mov 	x2, x15
         mov     x0, #1
         mov 	x1, x20
