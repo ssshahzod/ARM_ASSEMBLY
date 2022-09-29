@@ -67,34 +67,49 @@ main:
 mycos:
 	//d8 - x
 	//d9 - 
-	mov 	x22, #0
+	mov 	x22, #-1
+	mov 	x23, #1
 	fmov	d11, d8
 	fmov 	d8, #1.0
-	fmov 	d15, d8
-	fadd	d10, d11, d8
-	fadd	d13, d11, d8
+	fmul	d14, d11, d11
+	fadd	d10, d8, d8
+	fadd	d13, d8, d8
+	fmov 	d11, #1.0
 0:
 	add		x22, x22, #1
 	fmov	d12, d8 //previous sum
-	fmul	d11, d11, d11 //store multiplication
-	//fmov	d6, d11 //save abs value
+	fmul	d11, d11, d14 //store multiplication	
+	fdiv	d1, d11, d13  //divide to factorial
 	
-	fdiv	d11, d11, d13  //divide to factorial
-	fneg 	d11, d11
-	fadd	d8, d8, d11 
+	cmp 	x23, #0
+	bgt		negate
+	b abs
 	
-	fadd	d10, d10, d15
+negate:
+	//fneg 	d1, d1
+	fsub 	d8, d8, d1
+	mov 	x23, #-1
+	b cont
+abs:
+	fadd	d8, d8, d1
+	mov 	x23, #1
+	
+cont:
+	fmov 	d2, #1.0
+	fadd	d10, d10, d2
 	fmul	d13, d13, d10
-	fadd	d10, d10, d15
+	fadd	d10, d10, d2
 	fmul	d13, d13, d10
 
 2:
 	ldr 	x0, [sp, filestruct]
 	adr x1, filestr
 	mov x2, x22
-	fmov d0, d8
+	fmov d0, d12
 	bl fprintf
-	fsub	d0, d12, d8
+	fabs 	d1, d12
+	fabs	d2, d8
+	fsub	d0, d1, d2
 	fcmp	d0, d9
 	bgt		0b
 	fmov	d0, d12
