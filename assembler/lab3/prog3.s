@@ -12,9 +12,9 @@ resstr:
 name:
 		.skip 1024
 buffer:
-		.skip 10
+		.skip 15 
 reading_buf_size:
-		.word 10
+		.word 15
         .text
         .align  2
         .global _start
@@ -101,6 +101,7 @@ work:
         mov 	x20, x3
         adr		x0, reading_buf_size
         ldr 	x21, [x0]
+        adr		x19, buffer
         mov 	w12, '\''
         mov 	w10, ' '
         mov 	w11, ' '
@@ -109,7 +110,7 @@ work:
         //read from file
         ldr     x0, [x29, fd]
         add     x1, x29, buf
-        mov     x2, #10 //reading buffer size
+        mov     x2, #15 //reading buffer size
         mov     x8, #63
         svc     #0
 
@@ -132,7 +133,6 @@ work:
 		//beginning of the word
         mov 	x4, x1
         ldrb 	w8, [x1], #1
-        add		x17, x17, #1
         //cbz 	w8, 9f 
         cbz		w8, 5f
         cmp 	w8, '\t'
@@ -141,9 +141,7 @@ work:
 //        beq 	2b
         cmp 	w8, ' '
         beq 	2b
-        strb	w8, [x14], #1
-        cmp		x17, x0
-        beq		5f		
+        strb	w8, [x14], #1	
 
 3:
         ldrb 	w9, [x1]
@@ -156,35 +154,33 @@ work:
         cbz 	w9, 5f
         strb	w9, [x14], #1 //after this cycle buffer contains probably full word
         add		x1, x1, #1
-        add		x17, x17, #1
-        cmp		x17, x0
-        beq 	4f
         b 		3b
 
 4:  
         //work with word from buffer
-		//strb	w10, [x14]
+	    //strb	w10, [x14]
 		sub 	x14, x14, #1 //end of the word
 		adr 	x16, buffer
         ldrb 	w9, [x14] //work with the last letter of the word
         cmp 	w10, ' ' //save the last letter of the first word
         beq 	6f
-        cmp 	w9, w10
+        cbz 	w9, 2b
+        cmp 	w10, w9
         bne 	7f
-        add 	x1, x1, #1
         adr		x14, buffer
         b 		2b
+//        add 	x1, x1, #1
 5:	
 		//read file after previous part of the word saved in the buffer
 		ldr     x0, [x29, fd]
         add     x1, x29, buf
-        mov     x2, #10 //reading buffer size
+        mov     x2, #15 //reading buffer size
         mov     x8, #63
         svc     #0
         cmp     x0, #0
         beq 	9f //work with word from buffer //finish
-       // cmp 	w10, ' '
-       // beq 	clearbuf
+        cmp 	x14, x19
+        beq 	2b
         b 3b
 6:
         //save the last letter of the first word
@@ -210,11 +206,12 @@ work:
 		//close the string
 		mov 	w13, '\n'
 //		strb 	w12, [x3, #-1]!
-		strb 	w13, [x3, #1]!
-		strb	wzr, [x3, #1]!
+//		strb 	w13, [x3, #-1]!
+		//strb	wzr, [x3, #-1]!
+		strb	wzr, [x3, #-1]!
 		//write the text to stdout
 		//mov     x2, x0
-		add 	x15, x15, #1 //count how much symbols write to the output
+		//add 	x15, x15, #1 //count how much symbols write to the output
 		mov 	x2, x15
         mov     x0, #1
         mov 	x1, x20
@@ -234,7 +231,6 @@ work:
         ret
         .size   work, .-work
         .type   writeerr, %function
-
 
         .data
 usage:
