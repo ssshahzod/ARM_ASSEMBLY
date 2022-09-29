@@ -65,8 +65,6 @@ main:
 	ldr d9, [x29, y] //prepare parameters for cos 
 	ldr d8, [x29, x]
 mycos:
-	//d8 - x
-	//d9 - 
 	mov 	x22, #-1
 	mov 	x23, #1
 	fmov	d11, d8
@@ -86,7 +84,6 @@ mycos:
 	b abs
 	
 negate:
-	//fneg 	d1, d1
 	fsub 	d8, d8, d1
 	mov 	x23, #-1
 	b cont
@@ -107,9 +104,12 @@ cont:
 	mov x2, x22
 	fmov d0, d12
 	bl fprintf
+
 	fabs 	d1, d12
 	fabs	d2, d8
 	fsub	d0, d1, d2
+	fabs 	d0, d0
+	
 	fcmp	d0, d9
 	bgt		0b
 	fmov	d0, d12
